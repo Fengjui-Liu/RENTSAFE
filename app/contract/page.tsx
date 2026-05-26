@@ -1,0 +1,17 @@
+import { ContractDemo } from "@/components/contract-demo";
+
+export default function ContractPage() {
+  return (
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
+      <section className="space-y-4">
+        <p className="eyebrow">合約審查</p>
+        <h1 className="font-serif text-5xl leading-tight text-[color:var(--text-primary)]">把看不懂的條文，變成可決策的風險清單</h1>
+        <p className="max-w-3xl text-base leading-8 text-[color:var(--text-secondary)]">
+          上傳 PDF，快速找出高風險條款與簽約前注意事項。
+        </p>
+      </section>
+
+      <ContractDemo />
+    </div>
+  );
+}
