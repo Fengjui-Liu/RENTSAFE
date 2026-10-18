@@ -12,6 +12,23 @@ export default function ContractPage() {
       </section>
 
       <ContractDemo />
+
+      <section className="panel flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+        <div>
+          <h2 className="text-lg font-semibold text-[color:var(--text-primary)]">遇到租屋糾紛？</h2>
+          <p className="mt-1 text-sm leading-7 text-[color:var(--text-secondary)]">
+            崔媽媽基金會提供免費租屋法律諮詢與契約審閱服務。
+          </p>
+        </div>
+        <a
+          href="https://www.tmm.org.tw"
+          target="_blank"
+          rel="noreferrer"
+          className="button-secondary justify-center"
+        >
+          前往崔媽媽基金會
+        </a>
+      </section>
     </div>
   );
 }

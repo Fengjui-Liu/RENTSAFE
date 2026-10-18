@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useState } from "react";
+import { startTransition, useEffect, useRef, useState } from "react";
 import { AnalysisSteps } from "@/components/analysis-steps";
 import { StatusBadge } from "@/components/status-badge";
 import { contractLoadingSteps, mockContractResult } from "@/data/mock-data";
@@ -12,10 +12,24 @@ export function ContractDemo() {
   const [uploadedName, setUploadedName] = useState(mockContractResult.fileName);
   const [isDragging, setIsDragging] = useState(false);
 
+  const timerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current !== null) {
+        window.clearTimeout(timerRef.current);
+      }
+    };
+  }, []);
+
   const startAnalysis = () => {
+    if (demoState === "loading") {
+      return;
+    }
+
     setDemoState("loading");
 
-    window.setTimeout(() => {
+    timerRef.current = window.setTimeout(() => {
       startTransition(() => {
         setDemoState("done");
       });
@@ -72,8 +86,13 @@ export function ContractDemo() {
           已選擇檔案：<span className="text-[color:var(--text-primary)]">{uploadedName}</span>
         </div>
 
-        <button type="button" className="button-primary mt-5 w-full justify-center" onClick={startAnalysis}>
-          開始合約審查
+        <button
+          type="button"
+          className="button-primary mt-5 w-full justify-center disabled:cursor-wait disabled:opacity-60"
+          onClick={startAnalysis}
+          disabled={demoState === "loading"}
+        >
+          {demoState === "loading" ? "審查中..." : demoState === "done" ? "重新審查" : "開始合約審查"}
         </button>
       </section>
 

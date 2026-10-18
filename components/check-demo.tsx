@@ -1,8 +1,9 @@
 "use client";
 
-import { startTransition, useState } from "react";
+import { startTransition, useEffect, useRef, useState } from "react";
 import { AnalysisSteps } from "@/components/analysis-steps";
 import { StatusBadge } from "@/components/status-badge";
+import { TrafficLight } from "@/components/traffic-light";
 import { mockCheckResult, propertyLoadingSteps } from "@/data/mock-data";
 
 type DemoState = "idle" | "loading" | "done";
@@ -13,10 +14,24 @@ export function CheckDemo() {
   const [uploadedName, setUploadedName] = useState("591_租屋截圖.png");
   const [isDragging, setIsDragging] = useState(false);
 
+  const timerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current !== null) {
+        window.clearTimeout(timerRef.current);
+      }
+    };
+  }, []);
+
   const startAnalysis = () => {
+    if (demoState === "loading") {
+      return;
+    }
+
     setDemoState("loading");
 
-    window.setTimeout(() => {
+    timerRef.current = window.setTimeout(() => {
       startTransition(() => {
         setDemoState("done");
       });
@@ -90,8 +105,13 @@ export function CheckDemo() {
             />
           </label>
 
-          <button type="button" className="button-primary w-full justify-center" onClick={startAnalysis}>
-            開始物件查核
+          <button
+            type="button"
+            className="button-primary w-full justify-center disabled:cursor-wait disabled:opacity-60"
+            onClick={startAnalysis}
+            disabled={demoState === "loading"}
+          >
+            {demoState === "loading" ? "分析中..." : demoState === "done" ? "重新查核" : "開始物件查核"}
           </button>
         </div>
       </section>
@@ -155,7 +175,10 @@ export function CheckDemo() {
                   {mockCheckResult.modules.legality.items.map((item) => (
                     <article key={item.label} className="rounded-2xl border border-white/8 bg-black/20 p-4">
                       <div className="mb-3 flex items-center justify-between gap-3">
-                        <p className="font-medium text-[color:var(--text-primary)]">{item.label}</p>
+                        <div className="flex items-center gap-3">
+                          <TrafficLight status={item.status} />
+                          <p className="font-medium text-[color:var(--text-primary)]">{item.label}</p>
+                        </div>
                         <StatusBadge kind="status" value={item.status} />
                       </div>
                       <p className="text-sm leading-7 text-[color:var(--text-secondary)]">{item.detail}</p>
@@ -166,7 +189,10 @@ export function CheckDemo() {
 
               <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
                 <div className="mb-4 flex items-center justify-between gap-3">
-                  <h4 className="text-lg font-semibold text-[color:var(--text-primary)]">租金合理性</h4>
+                  <div className="flex items-center gap-3">
+                    <TrafficLight status={mockCheckResult.modules.pricing.status} />
+                    <h4 className="text-lg font-semibold text-[color:var(--text-primary)]">租金合理性</h4>
+                  </div>
                   <StatusBadge
                     kind="status"
                     value={mockCheckResult.modules.pricing.status}

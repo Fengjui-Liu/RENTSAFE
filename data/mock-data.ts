@@ -52,7 +52,7 @@ export const mockCheckResult = {
       ],
     },
     pricing: {
-      status: "danger" as Status,
+      status: "warning" as Status,
       marketMedian: 7200,
       listedPrice: 8000,
       deviation: 11.1,
@@ -106,11 +106,17 @@ export const mockContractResult = {
 export const featureCards = [
   {
     title: "建案合法性",
+    description: "比對建物登記謄本，揪出坪數灌水、頂樓加蓋與非法隔間。",
+    href: "/check",
   },
   {
     title: "租金合理性",
+    description: "對照實價登錄同區同類型行情，判斷報價是否偏高。",
+    href: "/check",
   },
   {
     title: "合約條款",
+    description: "逐條比對租賃定型化契約，標示違法與不利條款。",
+    href: "/contract",
   },
 ] as const;

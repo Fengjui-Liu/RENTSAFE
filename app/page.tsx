@@ -17,7 +17,7 @@ export default function Home() {
                 <span className="title-glow">看清你要租的房子</span>
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-[color:var(--text-secondary)]">
-                地政謄本 × 實價登錄 × AI，簽約前的第一道防線
+                整合地政謄本、實價登錄與 AI 技術，讓每個學生都能像專業人士一樣看房
               </p>
             </div>
 
@@ -38,6 +38,10 @@ export default function Home() {
               <div className="metric-card">
                 <p className="text-sm text-[color:var(--text-secondary)]">查核模組</p>
                 <p className="mt-2 text-3xl font-semibold text-[color:var(--text-primary)]">3 大面向</p>
+              </div>
+              <div className="metric-card">
+                <p className="text-sm text-[color:var(--text-secondary)]">使用費用</p>
+                <p className="mt-2 text-3xl font-semibold text-[color:var(--text-primary)]">免費</p>
               </div>
             </div>
           </div>
@@ -135,13 +139,14 @@ export default function Home() {
 
         <div className="grid gap-5 lg:grid-cols-3">
           {featureCards.map((card, index) => (
-            <article key={card.title} className="feature-card group p-6 transition hover:-translate-y-1">
+            <Link key={card.title} href={card.href} className="feature-card group block p-6 transition hover:-translate-y-1">
               <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[color:var(--primary)]/12 text-lg font-semibold text-[color:var(--primary)]">
                 0{index + 1}
               </div>
               <h3 className="font-serif text-2xl text-[color:var(--text-primary)]">{card.title}</h3>
+              <p className="mt-3 text-sm leading-7 text-[color:var(--text-secondary)]">{card.description}</p>
               <div className="mt-8 h-px bg-[linear-gradient(90deg,rgba(249,115,22,0.45),transparent)]" />
-            </article>
+            </Link>
           ))}
         </div>
       </section>

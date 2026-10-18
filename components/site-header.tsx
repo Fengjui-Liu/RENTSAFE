@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { navigationItems } from "@/data/mock-data";
+import { SiteNav } from "@/components/site-nav";
 
 export function SiteHeader() {
   return (
@@ -18,22 +18,12 @@ export function SiteHeader() {
             </div>
           </Link>
 
-          <Link href="/check" className="button-primary hidden sm:inline-flex">
+          <Link href="/check" className="button-primary shrink-0">
             開始查核
           </Link>
         </div>
 
-        <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-[color:var(--text-secondary)]">
-          {navigationItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="transition hover:text-[color:var(--text-primary)]"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+        <SiteNav />
       </div>
     </header>
   );
