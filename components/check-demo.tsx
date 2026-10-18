@@ -4,7 +4,7 @@ import { startTransition, useEffect, useRef, useState } from "react";
 import { AnalysisSteps } from "@/components/analysis-steps";
 import { StatusBadge } from "@/components/status-badge";
 import { TrafficLight } from "@/components/traffic-light";
-import { mockCheckResult, propertyLoadingSteps } from "@/data/mock-data";
+import { mockCheckResult, mockHauntedDangerResult, propertyLoadingSteps } from "@/data/mock-data";
 
 type DemoState = "idle" | "loading" | "done";
 
@@ -13,6 +13,9 @@ export function CheckDemo() {
   const [link, setLink] = useState("");
   const [uploadedName, setUploadedName] = useState("591_租屋截圖.png");
   const [isDragging, setIsDragging] = useState(false);
+  const [showHauntedRecord, setShowHauntedRecord] = useState(false);
+  const haunted = showHauntedRecord ? mockHauntedDangerResult.haunted : mockCheckResult.modules.haunted;
+  const summary = showHauntedRecord ? mockHauntedDangerResult.summary : mockCheckResult.summary;
 
   const timerRef = useRef<number | null>(null);
 
@@ -162,7 +165,31 @@ export function CheckDemo() {
             </div>
 
             <div className="rounded-3xl border border-red-500/15 bg-red-500/8 p-5 text-sm leading-7 text-red-100">
-              {mockCheckResult.summary}
+              {summary}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 text-xs text-[color:var(--text-muted)]">
+              <span>示範情境</span>
+              <div className="inline-flex rounded-full border border-white/10 bg-black/30 p-1">
+                {[
+                  { value: false, label: "無凶宅紀錄" },
+                  { value: true, label: "有凶宅紀錄" },
+                ].map((option) => (
+                  <button
+                    key={option.label}
+                    type="button"
+                    aria-pressed={showHauntedRecord === option.value}
+                    onClick={() => setShowHauntedRecord(option.value)}
+                    className={`rounded-full px-3 py-1 transition ${
+                      showHauntedRecord === option.value
+                        ? "bg-[color:var(--primary)] font-semibold text-white"
+                        : "text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]"
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="space-y-4">
@@ -185,6 +212,22 @@ export function CheckDemo() {
                     </article>
                   ))}
                 </div>
+              </div>
+
+              <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <TrafficLight status={haunted.status} />
+                    <h4 className="text-lg font-semibold text-[color:var(--text-primary)]">{haunted.label}</h4>
+                  </div>
+                  <StatusBadge
+                    kind="status"
+                    value={haunted.status}
+                    overrideLabel={haunted.status === "danger" ? "有紀錄" : "無紀錄"}
+                  />
+                </div>
+                <p className="text-sm leading-7 text-[color:var(--text-secondary)]">{haunted.detail}</p>
+                <p className="mt-3 text-xs text-[color:var(--text-muted)]">{haunted.source}</p>
               </div>
 
               <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">

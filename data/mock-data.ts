@@ -59,8 +59,25 @@ export const mockCheckResult = {
       level: "偏高",
       detail: "報價高於文山區同類型物件中位數 11.1%",
     },
+    haunted: {
+      status: "safe" as Status,
+      label: "凶宅查詢",
+      detail: "比對內政部凶宅資料庫，此地址無凶宅紀錄",
+      source: "資料來源：內政部不動產成交案件實際資訊資料庫",
+    },
   },
   summary: "此物件存在 2 項高風險警示，建議謹慎評估或放棄此物件。",
+};
+
+// 第二筆測試資料：展示查到凶宅紀錄的情況
+export const mockHauntedDangerResult = {
+  haunted: {
+    status: "danger" as Status,
+    label: "凶宅查詢",
+    detail: "此地址於 2019 年有非自然死亡紀錄，建議謹慎評估",
+    source: "資料來源：內政部不動產成交案件實際資訊資料庫",
+  },
+  summary: "此物件存在 3 項高風險警示（含凶宅紀錄），建議謹慎評估或放棄此物件。",
 };
 
 export const mockContractResult = {
@@ -118,5 +135,10 @@ export const featureCards = [
     title: "合約條款",
     description: "逐條比對租賃定型化契約，標示違法與不利條款。",
     href: "/contract",
+  },
+  {
+    title: "凶宅查詢",
+    description: "比對內政部資料庫，確認是否有非自然死亡紀錄",
+    href: "/check",
   },
 ] as const;

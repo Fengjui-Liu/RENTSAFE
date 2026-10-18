@@ -137,7 +137,7 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="grid gap-5 lg:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {featureCards.map((card, index) => (
             <Link key={card.title} href={card.href} className="feature-card group block p-6 transition hover:-translate-y-1">
               <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[color:var(--primary)]/12 text-lg font-semibold text-[color:var(--primary)]">
