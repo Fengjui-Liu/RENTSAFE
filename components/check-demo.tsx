@@ -2,6 +2,7 @@
 
 import { startTransition, useEffect, useRef, useState } from "react";
 import { AnalysisSteps } from "@/components/analysis-steps";
+import { SourceTag } from "@/components/source-tag";
 import { StatusBadge } from "@/components/status-badge";
 import { TrafficLight } from "@/components/traffic-light";
 import { mockCheckResult, mockHauntedDangerResult, propertyLoadingSteps } from "@/data/mock-data";
@@ -16,6 +17,17 @@ export function CheckDemo() {
   const [showHauntedRecord, setShowHauntedRecord] = useState(false);
   const haunted = showHauntedRecord ? mockHauntedDangerResult.haunted : mockCheckResult.modules.haunted;
   const summary = showHauntedRecord ? mockHauntedDangerResult.summary : mockCheckResult.summary;
+  const statuses = [
+    ...mockCheckResult.modules.legality.items.map((item) => item.status),
+    mockCheckResult.modules.legality.status,
+    mockCheckResult.modules.pricing.status,
+    haunted.status,
+  ];
+  const overallLabel = statuses.includes("danger")
+    ? "建議謹慎評估"
+    : statuses.includes("warning")
+      ? "建議再確認"
+      : "風險較低";
 
   const timerRef = useRef<number | null>(null);
 
@@ -161,7 +173,7 @@ export function CheckDemo() {
                 <h3 className="mt-3 font-serif text-2xl text-[color:var(--text-primary)]">{mockCheckResult.address}</h3>
                 <p className="mt-2 text-sm text-[color:var(--text-secondary)]">分析完成時間：{mockCheckResult.analysisTime}</p>
               </div>
-              <StatusBadge kind="status" value="danger" overrideLabel="建議放棄" />
+              <StatusBadge kind="status" value="danger" overrideLabel={overallLabel} />
             </div>
 
             <div className="rounded-3xl border border-red-500/15 bg-red-500/8 p-5 text-sm leading-7 text-red-100">
@@ -172,8 +184,8 @@ export function CheckDemo() {
               <span>示範情境</span>
               <div className="inline-flex rounded-full border border-white/10 bg-black/30 p-1">
                 {[
-                  { value: false, label: "無凶宅紀錄" },
-                  { value: true, label: "有凶宅紀錄" },
+                  { value: false, label: "一般提醒" },
+                  { value: true, label: "情境示範：房東勾選「有」／新聞報導" },
                 ].map((option) => (
                   <button
                     key={option.label}
@@ -196,7 +208,10 @@ export function CheckDemo() {
               <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
                 <div className="mb-4 flex items-center justify-between gap-3">
                   <h4 className="text-lg font-semibold text-[color:var(--text-primary)]">建案合法性</h4>
-                  <StatusBadge kind="status" value={mockCheckResult.modules.legality.status} />
+                  <div className="flex items-center gap-2">
+                    <SourceTag source={mockCheckResult.modules.legality.source} />
+                    <StatusBadge kind="status" value={mockCheckResult.modules.legality.status} />
+                  </div>
                 </div>
                 <div className="space-y-3">
                   {mockCheckResult.modules.legality.items.map((item) => (
@@ -206,7 +221,11 @@ export function CheckDemo() {
                           <TrafficLight status={item.status} />
                           <p className="font-medium text-[color:var(--text-primary)]">{item.label}</p>
                         </div>
-                        <StatusBadge kind="status" value={item.status} />
+                        <StatusBadge
+                          kind="status"
+                          value={item.status}
+                          overrideLabel={item.status === "danger" ? "高風險" : undefined}
+                        />
                       </div>
                       <p className="text-sm leading-7 text-[color:var(--text-secondary)]">{item.detail}</p>
                     </article>
@@ -217,30 +236,17 @@ export function CheckDemo() {
               <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
                 <div className="mb-4 flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <TrafficLight status={haunted.status} />
-                    <h4 className="text-lg font-semibold text-[color:var(--text-primary)]">{haunted.label}</h4>
-                  </div>
-                  <StatusBadge
-                    kind="status"
-                    value={haunted.status}
-                    overrideLabel={haunted.status === "danger" ? "有紀錄" : "無紀錄"}
-                  />
-                </div>
-                <p className="text-sm leading-7 text-[color:var(--text-secondary)]">{haunted.detail}</p>
-                <p className="mt-3 text-xs text-[color:var(--text-muted)]">{haunted.source}</p>
-              </div>
-
-              <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
-                <div className="mb-4 flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
                     <TrafficLight status={mockCheckResult.modules.pricing.status} />
                     <h4 className="text-lg font-semibold text-[color:var(--text-primary)]">租金合理性</h4>
                   </div>
-                  <StatusBadge
-                    kind="status"
-                    value={mockCheckResult.modules.pricing.status}
-                    overrideLabel={mockCheckResult.modules.pricing.level}
-                  />
+                  <div className="flex items-center gap-2">
+                    <SourceTag source={mockCheckResult.modules.pricing.source} />
+                    <StatusBadge
+                      kind="status"
+                      value={mockCheckResult.modules.pricing.status}
+                      overrideLabel={mockCheckResult.modules.pricing.level}
+                    />
+                  </div>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-3">
                   <div className="rounded-2xl border border-white/8 bg-black/20 p-4">
@@ -265,6 +271,31 @@ export function CheckDemo() {
                 <p className="mt-4 text-sm leading-7 text-[color:var(--text-secondary)]">
                   {mockCheckResult.modules.pricing.detail}
                 </p>
+              </div>
+
+              <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <TrafficLight status={haunted.status} />
+                    <h4 className="text-lg font-semibold text-[color:var(--text-primary)]">{haunted.label}</h4>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <SourceTag source={haunted.source} />
+                    <StatusBadge kind="status" value={haunted.status} overrideLabel={haunted.status === "danger" ? "謹慎評估" : "需自行確認"} />
+                  </div>
+                </div>
+                <p className="text-sm leading-7 text-[color:var(--text-secondary)]">{haunted.detail}</p>
+                {!showHauntedRecord && (
+                  <>
+                    <ul className="mt-3 list-disc space-y-1 pl-5 text-sm leading-7 text-[color:var(--text-secondary)]">
+                      {mockCheckResult.modules.haunted.checklist.map((step) => (
+                        <li key={step}>{step}</li>
+                      ))}
+                    </ul>
+                    <p className="mt-3 text-xs text-[color:var(--text-muted)]">{mockCheckResult.modules.haunted.note}</p>
+                  </>
+                )}
+                {showHauntedRecord && <p className="mt-3 text-xs text-[color:var(--text-muted)]">情境示範</p>}
               </div>
             </div>
           </div>

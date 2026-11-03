@@ -2,10 +2,14 @@
 
 import { startTransition, useEffect, useRef, useState } from "react";
 import { AnalysisSteps } from "@/components/analysis-steps";
+import { SourceTag } from "@/components/source-tag";
 import { StatusBadge } from "@/components/status-badge";
 import { contractLoadingSteps, mockContractResult } from "@/data/mock-data";
 
 type DemoState = "idle" | "loading" | "done";
+
+const highRiskCount = mockContractResult.clauses.filter((clause) => clause.risk === "high").length;
+const mediumRiskCount = mockContractResult.clauses.filter((clause) => clause.risk === "medium").length;
 
 export function ContractDemo() {
   const [demoState, setDemoState] = useState<DemoState>("idle");
@@ -110,11 +114,11 @@ export function ContractDemo() {
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="rounded-3xl border border-red-500/15 bg-red-500/8 p-5">
                 <p className="text-sm text-red-200">高風險</p>
-                <p className="mt-2 text-3xl font-semibold text-[color:var(--text-primary)]">2 條</p>
+                <p className="mt-2 text-3xl font-semibold text-[color:var(--text-primary)]">{highRiskCount} 條</p>
               </div>
               <div className="rounded-3xl border border-amber-500/15 bg-amber-500/8 p-5">
                 <p className="text-sm text-amber-200">中風險</p>
-                <p className="mt-2 text-3xl font-semibold text-[color:var(--text-primary)]">1 條</p>
+                <p className="mt-2 text-3xl font-semibold text-[color:var(--text-primary)]">{mediumRiskCount} 條</p>
               </div>
               <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
                 <p className="text-sm text-[color:var(--text-secondary)]">分析時間</p>
@@ -142,7 +146,10 @@ export function ContractDemo() {
                 <h3 className="mt-3 font-serif text-2xl text-[color:var(--text-primary)]">{mockContractResult.fileName}</h3>
                 <p className="mt-2 text-sm text-[color:var(--text-secondary)]">分析完成時間：{mockContractResult.analysisTime}</p>
               </div>
-              <StatusBadge kind="risk" value={mockContractResult.riskLevel} />
+              <div className="flex items-center gap-2">
+                <SourceTag source={mockContractResult.source} />
+                <StatusBadge kind="risk" value={mockContractResult.riskLevel} />
+              </div>
             </div>
 
             <div className="space-y-4">
@@ -164,6 +171,10 @@ export function ContractDemo() {
                     <div>
                       <dt className="text-[color:var(--text-muted)]">建議作法</dt>
                       <dd>{clause.suggestion}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-[color:var(--text-muted)]">範本依據</dt>
+                      <dd>{clause.basis}</dd>
                     </div>
                   </dl>
                 </article>

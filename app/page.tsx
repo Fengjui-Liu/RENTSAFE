@@ -70,7 +70,7 @@ export default function Home() {
                   <div className="space-y-3">
                     <div>
                       <div className="mb-1 flex items-center justify-between text-xs text-red-200">
-                        <span>違規風險</span>
+                        <span>高風險項目</span>
                         <span>76%</span>
                       </div>
                       <div className="h-2 rounded-full bg-white/8">
