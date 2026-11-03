@@ -1,4 +1,5 @@
 // 展示模式（F1）預設案例。結果仍取自 mock-data.ts，這裡只記載入時要帶入的輸入，不複製結果資料。
+import { contractSamples } from "@/data/contract-samples";
 import { mockContractResult } from "@/data/mock-data";
 
 export type CheckDemoCase = {
@@ -11,13 +12,16 @@ export type CheckDemoCase = {
   showHauntedRecord: boolean;
 };
 
-export type ContractDemoCase = {
+type ContractDemoCaseBase = {
   id: string;
   title: string;
   description: string;
-  kind: "pdf";
-  fileName: string;
 };
+
+// pdf：只做假的 loading，顯示 mockContractResult；text：把示範文字帶入「貼上合約文字」，跑 F3 規則比對
+export type ContractDemoCase =
+  | (ContractDemoCaseBase & { kind: "pdf"; fileName: string })
+  | (ContractDemoCaseBase & { kind: "text"; text: string });
 
 export const checkDemoCases: readonly CheckDemoCase[] = [
   {
@@ -46,6 +50,13 @@ export const contractDemoCases: readonly ContractDemoCase[] = [
     kind: "pdf",
     fileName: mockContractResult.fileName,
   },
+  ...contractSamples.map((sample) => ({
+    id: sample.id,
+    title: sample.title,
+    description: sample.description,
+    kind: "text" as const,
+    text: sample.text,
+  })),
 ];
 
 export function findCheckDemoCase(id: string | undefined) {
