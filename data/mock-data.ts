@@ -4,6 +4,7 @@ export type DataSource = "real" | "rules" | "mock";
 
 export const navigationItems = [
   { href: "/", label: "首頁" },
+  { href: "/tour", label: "情境看房" },
   { href: "/check", label: "物件查核" },
   { href: "/contract", label: "合約審查" },
   { href: "/about", label: "關於我們" },
