@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SourceTag } from "@/components/source-tag";
 import { featureCards } from "@/data/mock-data";
 
 export default function Home() {
@@ -53,9 +54,12 @@ export default function Home() {
               <div className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(249,115,22,0.8),transparent)]" />
               <div className="mb-6 flex items-center justify-between">
                 <p className="text-sm text-[color:var(--text-secondary)]">物件健康分數</p>
-                <span className="rounded-full bg-red-500/12 px-3 py-1 text-xs font-semibold text-red-300">
-                  高風險
-                </span>
+                <div className="flex items-center gap-2">
+                  <SourceTag source="mock" />
+                  <span className="rounded-full bg-red-500/12 px-3 py-1 text-xs font-semibold text-red-300">
+                    高風險
+                  </span>
+                </div>
               </div>
               <div className="mb-8 grid gap-4 sm:grid-cols-[0.9fr_1.1fr] sm:items-end">
                 <div>
