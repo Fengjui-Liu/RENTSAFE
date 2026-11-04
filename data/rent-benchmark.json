@@ -1,0 +1,609 @@
+{
+  "city": "臺北市",
+  "period": {
+    "from": "2026-08-11",
+    "to": "2026-09-16"
+  },
+  "periodNote": "租賃訂約日期，內政部實價登錄公開資料，非即時",
+  "sources": [
+    "contract_2026-08-11_to_08-20",
+    "contract_2026-08-21_to_08-31",
+    "contract_2026-09-01_to_09-10",
+    "contract_2026-09-11_to_09-20"
+  ],
+  "generatedAt": "2026-11-04T10:19:49+08:00",
+  "dataSource": "內政部實價登錄（租賃）",
+  "minSampleSize": 10,
+  "method": "篩選交易標的為租賃房屋、建物型態為公寓／住宅大樓／華廈／透天厝／套房；各行政區×出租型態以 IQR（1.5 倍）排除月租離群值後計算中位數與第 25、75 百分位；樣本數少於 10 標示樣本不足、不提供統計值；每坪月租 = 單價元平方公尺 × 3.3058；分租套房、分租雅房的月租為單間租金，但建物總面積可能為整層面積，故僅提供月租、不提供每坪月租",
+  "districts": {
+    "中山區": {
+      "分租套房": {
+        "sampleSize": 56,
+        "outliersRemoved": 9,
+        "rent": {
+          "median": 17650,
+          "p25": 15500,
+          "p75": 19500
+        }
+      },
+      "分租雅房": {
+        "sampleSize": 31,
+        "outliersRemoved": 0,
+        "rent": {
+          "median": 13800,
+          "p25": 11800,
+          "p75": 15150
+        }
+      },
+      "整棟(戶)出租": {
+        "sampleSize": 139,
+        "outliersRemoved": 4,
+        "rent": {
+          "median": 35000,
+          "p25": 27000,
+          "p75": 57000
+        },
+        "perPing": {
+          "median": 1630,
+          "p25": 1172,
+          "p75": 2564
+        }
+      },
+      "獨立套房": {
+        "sampleSize": 183,
+        "outliersRemoved": 9,
+        "rent": {
+          "median": 16000,
+          "p25": 13700,
+          "p75": 18800
+        },
+        "perPing": {
+          "median": 1587,
+          "p25": 1336,
+          "p75": 1866
+        }
+      }
+    },
+    "中正區": {
+      "分層出租": {
+        "insufficient": true,
+        "sampleSize": 3
+      },
+      "分租套房": {
+        "sampleSize": 19,
+        "outliersRemoved": 1,
+        "rent": {
+          "median": 19300,
+          "p25": 14650,
+          "p75": 22500
+        }
+      },
+      "分租雅房": {
+        "sampleSize": 41,
+        "outliersRemoved": 3,
+        "rent": {
+          "median": 14000,
+          "p25": 12900,
+          "p75": 15500
+        }
+      },
+      "整棟(戶)出租": {
+        "sampleSize": 52,
+        "outliersRemoved": 6,
+        "rent": {
+          "median": 28500,
+          "p25": 25000,
+          "p75": 36000
+        },
+        "perPing": {
+          "median": 1152,
+          "p25": 1021,
+          "p75": 1507
+        }
+      },
+      "獨立套房": {
+        "sampleSize": 42,
+        "outliersRemoved": 0,
+        "rent": {
+          "median": 16500,
+          "p25": 12625,
+          "p75": 21000
+        },
+        "perPing": {
+          "median": 1517,
+          "p25": 1163,
+          "p75": 1812
+        }
+      }
+    },
+    "信義區": {
+      "分層出租": {
+        "insufficient": true,
+        "sampleSize": 1
+      },
+      "分租套房": {
+        "sampleSize": 33,
+        "outliersRemoved": 2,
+        "rent": {
+          "median": 17800,
+          "p25": 14000,
+          "p75": 19500
+        }
+      },
+      "分租雅房": {
+        "sampleSize": 60,
+        "outliersRemoved": 10,
+        "rent": {
+          "median": 14000,
+          "p25": 13275,
+          "p75": 15300
+        }
+      },
+      "整棟(戶)出租": {
+        "sampleSize": 84,
+        "outliersRemoved": 20,
+        "rent": {
+          "median": 28450,
+          "p25": 22000,
+          "p75": 31625
+        },
+        "perPing": {
+          "median": 1084,
+          "p25": 919,
+          "p75": 1226
+        }
+      },
+      "獨立套房": {
+        "sampleSize": 17,
+        "outliersRemoved": 2,
+        "rent": {
+          "median": 20838,
+          "p25": 15000,
+          "p75": 30000
+        },
+        "perPing": {
+          "median": 1772,
+          "p25": 1617,
+          "p75": 2136
+        }
+      }
+    },
+    "內湖區": {
+      "分租套房": {
+        "sampleSize": 33,
+        "outliersRemoved": 0,
+        "rent": {
+          "median": 15800,
+          "p25": 13800,
+          "p75": 21500
+        }
+      },
+      "分租雅房": {
+        "sampleSize": 32,
+        "outliersRemoved": 1,
+        "rent": {
+          "median": 12250,
+          "p25": 11000,
+          "p75": 13575
+        }
+      },
+      "整棟(戶)出租": {
+        "sampleSize": 104,
+        "outliersRemoved": 2,
+        "rent": {
+          "median": 28000,
+          "p25": 25000,
+          "p75": 32000
+        },
+        "perPing": {
+          "median": 992,
+          "p25": 826,
+          "p75": 1181
+        }
+      },
+      "獨立套房": {
+        "sampleSize": 19,
+        "outliersRemoved": 0,
+        "rent": {
+          "median": 20000,
+          "p25": 17000,
+          "p75": 23500
+        },
+        "perPing": {
+          "median": 1706,
+          "p25": 1306,
+          "p75": 1821
+        }
+      }
+    },
+    "北投區": {
+      "分租套房": {
+        "insufficient": true,
+        "sampleSize": 9
+      },
+      "分租雅房": {
+        "insufficient": true,
+        "sampleSize": 3
+      },
+      "整棟(戶)出租": {
+        "sampleSize": 108,
+        "outliersRemoved": 7,
+        "rent": {
+          "median": 23000,
+          "p25": 18375,
+          "p75": 28000
+        },
+        "perPing": {
+          "median": 886,
+          "p25": 703,
+          "p75": 1011
+        }
+      },
+      "獨立套房": {
+        "sampleSize": 51,
+        "outliersRemoved": 0,
+        "rent": {
+          "median": 16500,
+          "p25": 13000,
+          "p75": 18392
+        },
+        "perPing": {
+          "median": 1200,
+          "p25": 969,
+          "p75": 1446
+        }
+      }
+    },
+    "南港區": {
+      "分租套房": {
+        "sampleSize": 14,
+        "outliersRemoved": 0,
+        "rent": {
+          "median": 15500,
+          "p25": 12625,
+          "p75": 27250
+        }
+      },
+      "分租雅房": {
+        "sampleSize": 20,
+        "outliersRemoved": 0,
+        "rent": {
+          "median": 12250,
+          "p25": 8725,
+          "p75": 13925
+        }
+      },
+      "整棟(戶)出租": {
+        "sampleSize": 45,
+        "outliersRemoved": 1,
+        "rent": {
+          "median": 28000,
+          "p25": 23000,
+          "p75": 32000
+        },
+        "perPing": {
+          "median": 1061,
+          "p25": 856,
+          "p75": 1319
+        }
+      },
+      "獨立套房": {
+        "sampleSize": 14,
+        "outliersRemoved": 1,
+        "rent": {
+          "median": 17500,
+          "p25": 13500,
+          "p75": 19425
+        },
+        "perPing": {
+          "median": 1010,
+          "p25": 785,
+          "p75": 1429
+        }
+      }
+    },
+    "士林區": {
+      "分層出租": {
+        "insufficient": true,
+        "sampleSize": 1
+      },
+      "分租套房": {
+        "sampleSize": 37,
+        "outliersRemoved": 0,
+        "rent": {
+          "median": 16000,
+          "p25": 14000,
+          "p75": 19800
+        }
+      },
+      "分租雅房": {
+        "sampleSize": 23,
+        "outliersRemoved": 0,
+        "rent": {
+          "median": 11800,
+          "p25": 8450,
+          "p75": 13500
+        }
+      },
+      "整棟(戶)出租": {
+        "sampleSize": 116,
+        "outliersRemoved": 8,
+        "rent": {
+          "median": 25000,
+          "p25": 19000,
+          "p75": 31125
+        },
+        "perPing": {
+          "median": 932,
+          "p25": 798,
+          "p75": 1090
+        }
+      },
+      "獨立套房": {
+        "sampleSize": 84,
+        "outliersRemoved": 5,
+        "rent": {
+          "median": 8750,
+          "p25": 8000,
+          "p75": 13000
+        },
+        "perPing": {
+          "median": 1144,
+          "p25": 1135,
+          "p75": 1355
+        }
+      }
+    },
+    "大同區": {
+      "分層出租": {
+        "insufficient": true,
+        "sampleSize": 1
+      },
+      "分租套房": {
+        "sampleSize": 27,
+        "outliersRemoved": 3,
+        "rent": {
+          "median": 16500,
+          "p25": 13500,
+          "p75": 17500
+        }
+      },
+      "分租雅房": {
+        "sampleSize": 10,
+        "outliersRemoved": 0,
+        "rent": {
+          "median": 12650,
+          "p25": 7462,
+          "p75": 14325
+        }
+      },
+      "整棟(戶)出租": {
+        "sampleSize": 58,
+        "outliersRemoved": 10,
+        "rent": {
+          "median": 26600,
+          "p25": 20500,
+          "p75": 31800
+        },
+        "perPing": {
+          "median": 1170,
+          "p25": 953,
+          "p75": 1407
+        }
+      },
+      "獨立套房": {
+        "sampleSize": 47,
+        "outliersRemoved": 9,
+        "rent": {
+          "median": 15000,
+          "p25": 14000,
+          "p75": 17000
+        },
+        "perPing": {
+          "median": 1620,
+          "p25": 1291,
+          "p75": 1792
+        }
+      }
+    },
+    "大安區": {
+      "分層出租": {
+        "insufficient": true,
+        "sampleSize": 2
+      },
+      "分租套房": {
+        "sampleSize": 76,
+        "outliersRemoved": 0,
+        "rent": {
+          "median": 19750,
+          "p25": 13750,
+          "p75": 30000
+        }
+      },
+      "分租雅房": {
+        "sampleSize": 81,
+        "outliersRemoved": 0,
+        "rent": {
+          "median": 13900,
+          "p25": 11000,
+          "p75": 14900
+        }
+      },
+      "整棟(戶)出租": {
+        "sampleSize": 80,
+        "outliersRemoved": 11,
+        "rent": {
+          "median": 32000,
+          "p25": 28000,
+          "p75": 40250
+        },
+        "perPing": {
+          "median": 1302,
+          "p25": 1011,
+          "p75": 1690
+        }
+      },
+      "獨立套房": {
+        "sampleSize": 36,
+        "outliersRemoved": 3,
+        "rent": {
+          "median": 19800,
+          "p25": 15975,
+          "p75": 24500
+        },
+        "perPing": {
+          "median": 1934,
+          "p25": 1486,
+          "p75": 2203
+        }
+      }
+    },
+    "文山區": {
+      "分租套房": {
+        "sampleSize": 17,
+        "outliersRemoved": 2,
+        "rent": {
+          "median": 12000,
+          "p25": 11000,
+          "p75": 12500
+        }
+      },
+      "分租雅房": {
+        "sampleSize": 32,
+        "outliersRemoved": 1,
+        "rent": {
+          "median": 10500,
+          "p25": 8000,
+          "p75": 11500
+        }
+      },
+      "整棟(戶)出租": {
+        "sampleSize": 102,
+        "outliersRemoved": 1,
+        "rent": {
+          "median": 27000,
+          "p25": 23000,
+          "p75": 30000
+        },
+        "perPing": {
+          "median": 899,
+          "p25": 788,
+          "p75": 1055
+        }
+      },
+      "獨立套房": {
+        "sampleSize": 30,
+        "outliersRemoved": 9,
+        "rent": {
+          "median": 15750,
+          "p25": 15000,
+          "p75": 17000
+        },
+        "perPing": {
+          "median": 1185,
+          "p25": 1067,
+          "p75": 1421
+        }
+      }
+    },
+    "松山區": {
+      "分層出租": {
+        "insufficient": true,
+        "sampleSize": 3
+      },
+      "分租套房": {
+        "sampleSize": 30,
+        "outliersRemoved": 10,
+        "rent": {
+          "median": 20500,
+          "p25": 20000,
+          "p75": 21500
+        }
+      },
+      "分租雅房": {
+        "sampleSize": 24,
+        "outliersRemoved": 3,
+        "rent": {
+          "median": 14900,
+          "p25": 14300,
+          "p75": 15800
+        }
+      },
+      "整棟(戶)出租": {
+        "sampleSize": 55,
+        "outliersRemoved": 10,
+        "rent": {
+          "median": 30700,
+          "p25": 28000,
+          "p75": 34400
+        },
+        "perPing": {
+          "median": 1180,
+          "p25": 1076,
+          "p75": 1383
+        }
+      },
+      "獨立套房": {
+        "sampleSize": 22,
+        "outliersRemoved": 0,
+        "rent": {
+          "median": 20250,
+          "p25": 19022,
+          "p75": 25500
+        },
+        "perPing": {
+          "median": 1755,
+          "p25": 1421,
+          "p75": 1953
+        }
+      }
+    },
+    "萬華區": {
+      "分層出租": {
+        "insufficient": true,
+        "sampleSize": 2
+      },
+      "分租套房": {
+        "sampleSize": 23,
+        "outliersRemoved": 0,
+        "rent": {
+          "median": 17000,
+          "p25": 14150,
+          "p75": 25800
+        }
+      },
+      "分租雅房": {
+        "insufficient": true,
+        "sampleSize": 6
+      },
+      "整棟(戶)出租": {
+        "sampleSize": 120,
+        "outliersRemoved": 4,
+        "rent": {
+          "median": 22850,
+          "p25": 18000,
+          "p75": 25250
+        },
+        "perPing": {
+          "median": 945,
+          "p25": 789,
+          "p75": 1288
+        }
+      },
+      "獨立套房": {
+        "sampleSize": 100,
+        "outliersRemoved": 6,
+        "rent": {
+          "median": 14000,
+          "p25": 12000,
+          "p75": 17550
+        },
+        "perPing": {
+          "median": 1344,
+          "p25": 1064,
+          "p75": 1783
+        }
+      }
+    }
+  }
+}

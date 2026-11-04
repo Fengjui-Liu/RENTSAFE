@@ -1,6 +1,9 @@
 import { ContractDemo } from "@/components/contract-demo";
 
-export default function ContractPage() {
+export default async function ContractPage({ searchParams }: PageProps<"/contract">) {
+  const { case: caseParam } = await searchParams;
+  const initialCaseId = typeof caseParam === "string" ? caseParam : undefined;
+
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
       <section className="space-y-4">
@@ -11,7 +14,7 @@ export default function ContractPage() {
         </p>
       </section>
 
-      <ContractDemo />
+      <ContractDemo key={initialCaseId ?? "default"} initialCaseId={initialCaseId} />
 
       <section className="panel flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
         <div>

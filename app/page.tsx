@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SourceTag } from "@/components/source-tag";
 import { featureCards } from "@/data/mock-data";
 
 export default function Home() {
@@ -17,7 +18,7 @@ export default function Home() {
                 <span className="title-glow">看清你要租的房子</span>
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-[color:var(--text-secondary)]">
-                整合地政謄本、實價登錄與 AI 技術，讓每個學生都能像專業人士一樣看房
+                整合內政部實價登錄與住宅租賃契約書範本，讓每個學生都能像專業人士一樣看房
               </p>
             </div>
 
@@ -53,9 +54,12 @@ export default function Home() {
               <div className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(249,115,22,0.8),transparent)]" />
               <div className="mb-6 flex items-center justify-between">
                 <p className="text-sm text-[color:var(--text-secondary)]">物件健康分數</p>
-                <span className="rounded-full bg-red-500/12 px-3 py-1 text-xs font-semibold text-red-300">
-                  高風險
-                </span>
+                <div className="flex items-center gap-2">
+                  <SourceTag source="mock" />
+                  <span className="rounded-full bg-red-500/12 px-3 py-1 text-xs font-semibold text-red-300">
+                    高風險
+                  </span>
+                </div>
               </div>
               <div className="mb-8 grid gap-4 sm:grid-cols-[0.9fr_1.1fr] sm:items-end">
                 <div>
@@ -87,13 +91,11 @@ export default function Home() {
                       </div>
                     </div>
                     <div>
-                      <div className="mb-1 flex items-center justify-between text-xs text-emerald-200">
+                      <div className="mb-1 flex items-center justify-between text-xs text-amber-200">
                         <span>補貼資格</span>
-                        <span>82%</span>
+                        <span>需自行確認</span>
                       </div>
-                      <div className="h-2 rounded-full bg-white/8">
-                        <div className="h-2 w-[82%] rounded-full bg-[linear-gradient(90deg,#22c55e,#84cc16)]" />
-                      </div>
+                      <div className="h-2 rounded-full bg-white/8" />
                     </div>
                   </div>
                 </div>
@@ -113,12 +115,12 @@ export default function Home() {
                   </div>
                   <p className="text-sm leading-7 text-amber-50/85">高於區域中位數 11.1%</p>
                 </div>
-                <div className="rounded-2xl border border-emerald-500/15 bg-emerald-500/8 p-4 backdrop-blur-sm">
+                <div className="rounded-2xl border border-amber-500/15 bg-amber-500/8 p-4 backdrop-blur-sm">
                   <div className="mb-2 flex items-center justify-between">
-                    <p className="text-sm font-semibold text-emerald-200">符合租金補貼基本條件</p>
-                    <span className="text-[11px] uppercase tracking-[0.28em] text-emerald-300">Safe</span>
+                    <p className="text-sm font-semibold text-amber-200">租金補貼資格</p>
+                    <span className="text-[11px] uppercase tracking-[0.28em] text-amber-300">需自行確認</span>
                   </div>
-                  <p className="text-sm leading-7 text-emerald-50/85">符合基本申請條件，建議確認房東身份</p>
+                  <p className="text-sm leading-7 text-amber-50/85">補貼資格請依主管機關公告確認，本工具無法查證</p>
                 </div>
               </div>
             </div>

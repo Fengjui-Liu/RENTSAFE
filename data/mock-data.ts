@@ -4,18 +4,26 @@ export type DataSource = "real" | "rules" | "mock";
 
 export const navigationItems = [
   { href: "/", label: "首頁" },
+  { href: "/tour", label: "情境看房" },
   { href: "/check", label: "物件查核" },
   { href: "/contract", label: "合約審查" },
   { href: "/about", label: "關於我們" },
 ] as const;
 
 export const propertyLoadingSteps = [
-  "正在解析物件資訊...",
-  "比對建物登記資料...",
-  "查核實價登錄租金行情...",
-  "產生體檢報告...",
+  "載入示範案例資料...",
+  "整理查核項目...",
+  "產生查核報告...",
 ] as const;
 
+// PDF 示範流程：只載入預設結果
+export const contractDemoLoadingSteps = [
+  "載入示範合約...",
+  "整理條款風險...",
+  "產生審查報告...",
+] as const;
+
+// 貼上合約文字（F3）：實際依範本規則比對
 export const contractLoadingSteps = [
   "正在解析合約內容...",
   "比對住宅租賃契約書範本...",
@@ -77,7 +85,7 @@ export const mockCheckResult = {
       note: "房東可在產權持有前勾選「不知道」，填寫結果不等於保證沒有",
     },
   },
-  summary: "此物件存在 2 項高風險警示，建議謹慎評估或放棄此物件。",
+  summary: "此物件存在 2 項高風險警示，建議謹慎評估。",
 };
 
 // 第二筆測試資料：情境示範
