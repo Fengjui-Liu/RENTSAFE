@@ -201,7 +201,7 @@ export function CheckDemo({ initialCaseId }: { initialCaseId?: string }) {
             <div className="space-y-6">
               <div>
                 <p className="eyebrow">分析中</p>
-                <h3 className="mt-3 font-serif text-3xl text-[color:var(--text-primary)]">AI 正在產生物件體檢報告</h3>
+                <h3 className="mt-3 font-serif text-3xl text-[color:var(--text-primary)]">正在載入示範案例的查核結果</h3>
               </div>
               <AnalysisSteps steps={propertyLoadingSteps} />
             </div>
