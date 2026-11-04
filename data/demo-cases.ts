@@ -6,8 +6,9 @@ export type CheckDemoCase = {
   id: string;
   title: string;
   description: string;
-  uploadedName: string;
-  link: string;
+  district: "文山區";
+  rentalType: "獨立套房";
+  listedRent: number;
   // true：凶宅模組顯示 mockHauntedDangerResult 的情境示範
   showHauntedRecord: boolean;
 };
@@ -28,16 +29,18 @@ export const checkDemoCases: readonly CheckDemoCase[] = [
     id: "wenshan-studio",
     title: "文山區頂樓套房",
     description: "坪數不符、疑似頂樓加蓋、租金偏高",
-    uploadedName: "591_文山區套房截圖.png",
-    link: "https://rent.591.com.tw/home/示範物件",
+    district: "文山區",
+    rentalType: "獨立套房",
+    listedRent: 18000,
     showHauntedRecord: false,
   },
   {
     id: "wenshan-studio-haunted",
     title: "同一間房：房東在第 8 項勾選「有」",
     description: "情境示範：現況確認書第 8 項勾選「有」或有新聞報導",
-    uploadedName: "591_文山區套房截圖.png",
-    link: "https://rent.591.com.tw/home/示範物件",
+    district: "文山區",
+    rentalType: "獨立套房",
+    listedRent: 18000,
     showHauntedRecord: true,
   },
 ];

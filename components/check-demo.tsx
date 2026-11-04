@@ -1,349 +1,157 @@
 "use client";
 
-import { startTransition, useEffect, useRef, useState } from "react";
-import { AnalysisSteps } from "@/components/analysis-steps";
+import { useState } from "react";
+import { DemoCasePicker } from "@/components/demo-case-picker";
 import { SourceTag } from "@/components/source-tag";
 import { StatusBadge } from "@/components/status-badge";
 import { TrafficLight } from "@/components/traffic-light";
-import { DemoCasePicker } from "@/components/demo-case-picker";
 import { checkDemoCases, findCheckDemoCase } from "@/data/demo-cases";
-import { mockCheckResult, mockHauntedDangerResult, propertyLoadingSteps } from "@/data/mock-data";
+import { mockCheckResult, mockHauntedDangerResult } from "@/data/mock-data";
+import {
+  DISTRICTS,
+  RENTAL_TYPES,
+  getRentBenchmark,
+  type District,
+  type RentalType,
+  type RentBenchmarkResult,
+} from "@/lib/rent-benchmark";
 
-type DemoState = "idle" | "loading" | "done";
+type CheckMode = "manual" | "demo";
 
-const defaultUploadedName = "591_租屋截圖.png";
+const confirmationItems = [
+  { title: "建物登記與違建", detail: "目前尚未自動查證。請要求出租人說明有無未登記增建、加建或違建，並填寫現況確認書第 1 項。" },
+  { title: "隔間與出租型態", detail: "請現場核對格局與出租型態，並要求出租人填寫現況確認書第 2 項。" },
+  { title: "凶宅風險提醒", detail: "沒有官方資料庫可證明是否曾發生非自然死亡；請要求出租人填寫現況確認書第 8 項，並自行查詢新聞或詢問管理員。" },
+  { title: "租金補貼", detail: "資格請依主管機關公告確認；簽約時要留意，範本明載「承租人不得申請租金補貼」這類條款無效。" },
+] as const;
+
+function formatCurrency(value: number) {
+  return `$${value.toLocaleString("zh-TW")}`;
+}
+
+function RentResult({ result }: { result: RentBenchmarkResult }) {
+  if (result.kind === "unavailable") {
+    return <div className="rounded-3xl border border-amber-500/20 bg-amber-500/8 p-5 text-sm leading-7 text-amber-100">目前沒有「{result.district}・{result.rentalType}」的可用樣本，因此不判定行情高低。你可以改選其他出租型態。</div>;
+  }
+  if (result.kind === "insufficient") {
+    return (
+      <div className="space-y-3 rounded-3xl border border-amber-500/20 bg-amber-500/8 p-5 text-sm leading-7 text-amber-100">
+        <p>目前只有 {result.sampleSize} 筆有效樣本，少於最低門檻 10 筆，因此不提供中位數或行情判定。</p>
+        <SourceTag source="real" period={result.period} sampleSize={result.sampleSize} />
+      </div>
+    );
+  }
+
+  const deviationText = result.deviation > 0 ? `高於中位數 ${result.deviation}%` : result.deviation < 0 ? `低於中位數 ${Math.abs(result.deviation)}%` : "與中位數相同";
+  return (
+    <div className="space-y-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <TrafficLight status={result.status} />
+          <div><h4 className="text-lg font-semibold text-[color:var(--text-primary)]">{result.label}</h4><p className="mt-1 text-sm text-[color:var(--text-secondary)]">{result.district}・{result.rentalType}</p></div>
+        </div>
+        <StatusBadge kind="status" value={result.status} overrideLabel={result.label} />
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <Metric label="你的月租" value={formatCurrency(result.listedRent)} />
+        <Metric label="區域中位數" value={formatCurrency(result.rent.median)} />
+        <Metric label="主要行情區間" value={`${formatCurrency(result.rent.p25)}–${formatCurrency(result.rent.p75)}`} small />
+        <Metric label="與中位數比較" value={deviationText} small />
+      </div>
+      <p className="text-sm leading-7 text-[color:var(--text-secondary)]">{result.detail}</p>
+      <SourceTag source="real" period={result.period} sampleSize={result.sampleSize} />
+      <details className="text-xs leading-6 text-[color:var(--text-muted)]"><summary className="cursor-pointer">查看統計方法</summary><p className="mt-2">{result.method}</p></details>
+    </div>
+  );
+}
+
+function Metric({ label, value, small = false }: { label: string; value: string; small?: boolean }) {
+  return <div className="rounded-2xl border border-white/8 bg-black/20 p-4"><p className="text-xs text-[color:var(--text-muted)]">{label}</p><p className={`mt-2 font-semibold text-[color:var(--text-primary)] ${small ? "text-lg" : "text-2xl"}`}>{value}</p></div>;
+}
 
 export function CheckDemo({ initialCaseId }: { initialCaseId?: string }) {
   const initialCase = findCheckDemoCase(initialCaseId);
-  const [demoState, setDemoState] = useState<DemoState>("idle");
+  const [mode, setMode] = useState<CheckMode>(initialCase ? "demo" : "manual");
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(initialCase?.id ?? null);
-  const [link, setLink] = useState(initialCase?.link ?? "");
-  const [uploadedName, setUploadedName] = useState(initialCase?.uploadedName ?? defaultUploadedName);
-  const [isDragging, setIsDragging] = useState(false);
+  const [district, setDistrict] = useState<District>(initialCase?.district ?? "文山區");
+  const [rentalType, setRentalType] = useState<RentalType>(initialCase?.rentalType ?? "獨立套房");
+  const [listedRent, setListedRent] = useState(initialCase ? String(initialCase.listedRent) : "");
+  const [result, setResult] = useState<RentBenchmarkResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [showHauntedRecord, setShowHauntedRecord] = useState(initialCase?.showHauntedRecord ?? false);
-  const haunted = showHauntedRecord ? mockHauntedDangerResult.haunted : mockCheckResult.modules.haunted;
-  const summary = showHauntedRecord ? mockHauntedDangerResult.summary : mockCheckResult.summary;
-  const statuses = [
-    ...mockCheckResult.modules.legality.items.map((item) => item.status),
-    mockCheckResult.modules.legality.status,
-    mockCheckResult.modules.pricing.status,
-    haunted.status,
-  ];
-  const overallLabel = statuses.includes("danger")
-    ? "建議謹慎評估"
-    : statuses.includes("warning")
-      ? "建議再確認"
-      : "風險較低";
 
-  const timerRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (timerRef.current !== null) {
-        window.clearTimeout(timerRef.current);
-      }
-    };
-  }, []);
-
-  const clearTimer = () => {
-    if (timerRef.current !== null) {
-      window.clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
-  };
-
-  const runAnalysis = () => {
-    clearTimer();
-    setDemoState("loading");
-
-    timerRef.current = window.setTimeout(() => {
-      startTransition(() => {
-        setDemoState("done");
-      });
-    }, 2000);
-  };
-
-  const startAnalysis = () => {
-    if (demoState === "loading") {
+  const runCheck = (nextDistrict = district, nextType = rentalType, nextRent = listedRent) => {
+    const rent = Number(nextRent);
+    if (!Number.isInteger(rent) || rent <= 0 || rent > 1_000_000) {
+      setError("請輸入 1 至 1,000,000 元之間的整數月租");
+      setResult(null);
       return;
     }
+    setError(null);
+    setResult(getRentBenchmark(nextDistrict, nextType, rent));
+  };
 
-    runAnalysis();
+  const submitManual = () => {
+    setMode("manual"); setSelectedCaseId(null); setShowHauntedRecord(false); runCheck();
   };
 
   const loadCase = (id: string) => {
     const demoCase = findCheckDemoCase(id);
-    if (!demoCase) {
-      return;
-    }
-
-    setSelectedCaseId(demoCase.id);
-    setUploadedName(demoCase.uploadedName);
-    setLink(demoCase.link);
-    setShowHauntedRecord(demoCase.showHauntedRecord);
-    runAnalysis();
+    if (!demoCase) return;
+    const rent = String(demoCase.listedRent);
+    setMode("demo"); setSelectedCaseId(id); setDistrict(demoCase.district); setRentalType(demoCase.rentalType);
+    setListedRent(rent); setShowHauntedRecord(demoCase.showHauntedRecord); setError(null);
+    setResult(getRentBenchmark(demoCase.district, demoCase.rentalType, demoCase.listedRent));
   };
 
-  const resetDemo = () => {
-    clearTimer();
-    setDemoState("idle");
-    setSelectedCaseId(null);
-    setUploadedName(defaultUploadedName);
-    setLink("");
-    setShowHauntedRecord(false);
+  const reset = () => {
+    setMode("manual"); setSelectedCaseId(null); setDistrict("文山區"); setRentalType("獨立套房");
+    setListedRent(""); setResult(null); setError(null); setShowHauntedRecord(false);
   };
+
+  const haunted = showHauntedRecord ? mockHauntedDangerResult.haunted : mockCheckResult.modules.haunted;
 
   return (
-    <>
-      <DemoCasePicker cases={checkDemoCases} selectedId={selectedCaseId} onLoad={loadCase} onReset={resetDemo} />
-      <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+    <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
+      <div className="space-y-6">
         <section className="panel p-6 sm:p-8">
-          <div className="mb-6 space-y-3">
-            <p className="eyebrow">物件資料輸入</p>
-            <h2 className="font-serif text-3xl text-[color:var(--text-primary)]">上傳租屋截圖或貼上 591 連結</h2>
-          </div>
-
+          <div className="mb-6 space-y-3"><p className="eyebrow">真實行情查核</p><h2 className="font-serif text-3xl text-[color:var(--text-primary)]">輸入物件租屋條件</h2><p className="text-sm leading-7 text-[color:var(--text-secondary)]">目前支援臺北市。租金使用真實資料比較；建物與屋況資訊仍需另外確認。</p></div>
           <div className="space-y-5">
-            <label
-              className={`flex min-h-64 cursor-pointer flex-col items-center justify-center rounded-[28px] border border-dashed px-6 text-center transition ${
-                isDragging
-                  ? "border-[color:var(--primary)]/70 bg-[radial-gradient(circle_at_top,rgba(249,115,22,0.24),transparent_60%)]"
-                  : "border-[color:var(--primary)]/35 bg-[radial-gradient(circle_at_top,rgba(249,115,22,0.16),transparent_60%)] hover:border-[color:var(--primary)]/60"
-              }`}
-              onDragOver={(event) => {
-                event.preventDefault();
-                setIsDragging(true);
-              }}
-              onDragLeave={() => setIsDragging(false)}
-              onDrop={(event) => {
-                event.preventDefault();
-                setIsDragging(false);
-                const file = event.dataTransfer.files?.[0];
-                if (file) {
-                  setUploadedName(file.name);
-                }
-              }}
-            >
-              <span className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-[color:var(--primary)]/12 text-3xl text-[color:var(--primary)]">
-                ⤴
-              </span>
-              <span className="text-lg font-semibold text-[color:var(--text-primary)]">拖曳上傳 591 / FB 租屋截圖</span>
-              <span className="mt-2 text-sm text-[color:var(--text-secondary)]">或點擊模擬選擇圖片檔</span>
-              <input
-                type="file"
-                accept="image/*"
-                className="sr-only"
-                onChange={(event) => {
-                  const file = event.target.files?.[0];
-                  if (file) {
-                    setUploadedName(file.name);
-                  }
-                }}
-              />
-            </label>
-
-            <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-4 text-sm text-[color:var(--text-secondary)]">
-              已選擇檔案：<span className="text-[color:var(--text-primary)]">{uploadedName}</span>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <div className="h-px flex-1 bg-white/10" />
-              <span className="text-xs uppercase tracking-[0.36em] text-[color:var(--text-muted)]">或</span>
-              <div className="h-px flex-1 bg-white/10" />
-            </div>
-
-            <label className="space-y-2">
-              <span className="text-sm text-[color:var(--text-secondary)]">輸入 591 物件連結</span>
-              <input
-                value={link}
-                onChange={(event) => setLink(event.target.value)}
-                placeholder="https://rent.591.com.tw/home/..."
-                className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-sm text-[color:var(--text-primary)] outline-none transition placeholder:text-[color:var(--text-muted)] focus:border-[color:var(--primary)]/40"
-              />
-            </label>
-
-            <button
-              type="button"
-              className="button-primary w-full justify-center disabled:cursor-wait disabled:opacity-60"
-              onClick={startAnalysis}
-              disabled={demoState === "loading"}
-            >
-              {demoState === "loading" ? "分析中..." : demoState === "done" ? "重新查核" : "開始物件查核"}
-            </button>
+            <SelectField label="行政區" value={district} options={DISTRICTS} onChange={(value) => { setDistrict(value as District); setResult(null); }} />
+            <SelectField label="出租型態" value={rentalType} options={RENTAL_TYPES} onChange={(value) => { setRentalType(value as RentalType); setResult(null); }} />
+            <label className="block space-y-2"><span className="text-sm text-[color:var(--text-secondary)]">每月租金（元）</span><input inputMode="numeric" type="number" min="1" max="1000000" step="1" value={listedRent} onChange={(event) => { setListedRent(event.target.value); setResult(null); }} placeholder="例如 12000" className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-sm text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-muted)] focus:border-[color:var(--primary)]/40" /></label>
+            {error && <p role="alert" className="text-sm text-red-300">{error}</p>}
+            <button type="button" className="button-primary w-full justify-center" onClick={submitManual}>查看真實租金行情</button>
           </div>
         </section>
-
-        <section className="panel p-6 sm:p-8">
-          {demoState === "idle" && (
-            <div className="flex h-full min-h-96 flex-col justify-between">
-              <div className="space-y-3">
-                <p className="eyebrow">結果預覽</p>
-                <h3 className="font-serif text-3xl text-[color:var(--text-primary)]">讓風險先被看見</h3>
-                <p className="text-sm leading-7 text-[color:var(--text-secondary)]">
-                  系統會彙整建物合法性、租金合理性與凶宅風險提醒，輸出一張健康報告；補貼資格請依主管機關公告自行確認。
-                </p>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="rounded-3xl border border-red-500/15 bg-red-500/8 p-5">
-                  <p className="text-sm text-red-200">高風險警示</p>
-                  <p className="mt-2 text-3xl font-semibold text-[color:var(--text-primary)]">2 項</p>
-                </div>
-                <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
-                  <p className="text-sm text-[color:var(--text-secondary)]">平均分析時間</p>
-                  <p className="mt-2 text-3xl font-semibold text-[color:var(--text-primary)]">58 秒</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {demoState === "loading" && (
-            <div className="space-y-6">
-              <div>
-                <p className="eyebrow">分析中</p>
-                <h3 className="mt-3 font-serif text-3xl text-[color:var(--text-primary)]">正在載入示範案例的查核結果</h3>
-              </div>
-              <AnalysisSteps steps={propertyLoadingSteps} />
-            </div>
-          )}
-
-          {demoState === "done" && (
-            <div className="space-y-6">
-              <div className="flex flex-wrap items-start justify-between gap-4">
-                <div>
-                  <p className="eyebrow">體檢報告</p>
-                  <h3 className="mt-3 font-serif text-2xl text-[color:var(--text-primary)]">{mockCheckResult.address}</h3>
-                  <p className="mt-2 text-sm text-[color:var(--text-secondary)]">分析完成時間：{mockCheckResult.analysisTime}</p>
-                </div>
-                <StatusBadge kind="status" value="danger" overrideLabel={overallLabel} />
-              </div>
-
-              <div className="rounded-3xl border border-red-500/15 bg-red-500/8 p-5 text-sm leading-7 text-red-100">
-                {summary}
-              </div>
-
-              <div className="flex flex-wrap items-center gap-3 text-xs text-[color:var(--text-muted)]">
-                <span>示範情境</span>
-                <div className="inline-flex rounded-full border border-white/10 bg-black/30 p-1">
-                  {[
-                    { value: false, label: "一般提醒" },
-                    { value: true, label: "情境示範：房東勾選「有」／新聞報導" },
-                  ].map((option) => (
-                    <button
-                      key={option.label}
-                      type="button"
-                      aria-pressed={showHauntedRecord === option.value}
-                      onClick={() => setShowHauntedRecord(option.value)}
-                      className={`rounded-full px-3 py-1 transition ${
-                        showHauntedRecord === option.value
-                          ? "bg-[color:var(--primary)] font-semibold text-white"
-                          : "text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]"
-                      }`}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
-                  <div className="mb-4 flex items-center justify-between gap-3">
-                    <h4 className="text-lg font-semibold text-[color:var(--text-primary)]">建案合法性</h4>
-                    <div className="flex items-center gap-2">
-                      <SourceTag source={mockCheckResult.modules.legality.source} />
-                      <StatusBadge kind="status" value={mockCheckResult.modules.legality.status} />
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    {mockCheckResult.modules.legality.items.map((item) => (
-                      <article key={item.label} className="rounded-2xl border border-white/8 bg-black/20 p-4">
-                        <div className="mb-3 flex items-center justify-between gap-3">
-                          <div className="flex items-center gap-3">
-                            <TrafficLight status={item.status} />
-                            <p className="font-medium text-[color:var(--text-primary)]">{item.label}</p>
-                          </div>
-                          <StatusBadge
-                            kind="status"
-                            value={item.status}
-                            overrideLabel={item.status === "danger" ? "高風險" : undefined}
-                          />
-                        </div>
-                        <p className="text-sm leading-7 text-[color:var(--text-secondary)]">{item.detail}</p>
-                      </article>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
-                  <div className="mb-4 flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <TrafficLight status={mockCheckResult.modules.pricing.status} />
-                      <h4 className="text-lg font-semibold text-[color:var(--text-primary)]">租金合理性</h4>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <SourceTag source={mockCheckResult.modules.pricing.source} />
-                      <StatusBadge
-                        kind="status"
-                        value={mockCheckResult.modules.pricing.status}
-                        overrideLabel={mockCheckResult.modules.pricing.level}
-                      />
-                    </div>
-                  </div>
-                  <div className="grid gap-3 sm:grid-cols-3">
-                    <div className="rounded-2xl border border-white/8 bg-black/20 p-4">
-                      <p className="text-xs text-[color:var(--text-muted)]">區域中位數</p>
-                      <p className="mt-2 text-2xl font-semibold text-[color:var(--text-primary)]">
-                        ${mockCheckResult.modules.pricing.marketMedian.toLocaleString()}
-                      </p>
-                    </div>
-                    <div className="rounded-2xl border border-white/8 bg-black/20 p-4">
-                      <p className="text-xs text-[color:var(--text-muted)]">刊登租金</p>
-                      <p className="mt-2 text-2xl font-semibold text-[color:var(--text-primary)]">
-                        ${mockCheckResult.modules.pricing.listedPrice.toLocaleString()}
-                      </p>
-                    </div>
-                    <div className="rounded-2xl border border-white/8 bg-black/20 p-4">
-                      <p className="text-xs text-[color:var(--text-muted)]">行情偏差</p>
-                      <p className="mt-2 text-2xl font-semibold text-[color:var(--text-primary)]">
-                        {mockCheckResult.modules.pricing.deviation}%
-                      </p>
-                    </div>
-                  </div>
-                  <p className="mt-4 text-sm leading-7 text-[color:var(--text-secondary)]">
-                    {mockCheckResult.modules.pricing.detail}
-                  </p>
-                </div>
-
-                <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
-                  <div className="mb-4 flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <TrafficLight status={haunted.status} />
-                      <h4 className="text-lg font-semibold text-[color:var(--text-primary)]">{haunted.label}</h4>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <SourceTag source={haunted.source} />
-                      <StatusBadge kind="status" value={haunted.status} overrideLabel={haunted.status === "danger" ? "謹慎評估" : "需自行確認"} />
-                    </div>
-                  </div>
-                  <p className="text-sm leading-7 text-[color:var(--text-secondary)]">{haunted.detail}</p>
-                  {!showHauntedRecord && (
-                    <>
-                      <ul className="mt-3 list-disc space-y-1 pl-5 text-sm leading-7 text-[color:var(--text-secondary)]">
-                        {mockCheckResult.modules.haunted.checklist.map((step) => (
-                          <li key={step}>{step}</li>
-                        ))}
-                      </ul>
-                      <p className="mt-3 text-xs text-[color:var(--text-muted)]">{mockCheckResult.modules.haunted.note}</p>
-                    </>
-                  )}
-                  {showHauntedRecord && <p className="mt-3 text-xs text-[color:var(--text-muted)]">情境示範</p>}
-                </div>
-              </div>
-            </div>
-          )}
-        </section>
+        <DemoCasePicker cases={checkDemoCases} selectedId={selectedCaseId} onLoad={loadCase} onReset={reset} compact />
       </div>
-    </>
+
+      <section className="panel p-6 sm:p-8">
+        {!result ? <EmptyResult /> : (
+          <div className="space-y-7">
+            <div><p className="eyebrow">{mode === "demo" ? "完整展示案例" : "真實行情結果"}</p><h3 className="mt-3 font-serif text-2xl text-[color:var(--text-primary)]">臺北市{result.district}・{result.rentalType}</h3>{mode === "demo" && <p className="mt-2 text-sm text-[color:var(--text-secondary)]">租金行情使用真實資料；下方建物與屋況內容為情境示範。</p>}</div>
+            <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-5"><h4 className="mb-4 text-lg font-semibold text-[color:var(--text-primary)]">租金合理性</h4><RentResult result={result} /></div>
+            {mode === "manual" ? <ConfirmationList /> : <DemoModules haunted={haunted} showHauntedRecord={showHauntedRecord} />}
+          </div>
+        )}
+      </section>
+    </div>
   );
+}
+
+function SelectField({ label, value, options, onChange }: { label: string; value: string; options: readonly string[]; onChange: (value: string) => void }) {
+  return <label className="block space-y-2"><span className="text-sm text-[color:var(--text-secondary)]">{label}</span><select value={value} onChange={(event) => onChange(event.target.value)} className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-sm text-[color:var(--text-primary)] outline-none focus:border-[color:var(--primary)]/40">{options.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>;
+}
+
+function EmptyResult() {
+  return <div className="flex min-h-96 flex-col justify-between gap-8"><div className="space-y-3"><p className="eyebrow">結果預覽</p><h3 className="font-serif text-3xl text-[color:var(--text-primary)]">先看行情，再確認其他風險</h3><p className="text-sm leading-7 text-[color:var(--text-secondary)]">輸入三項條件後，會顯示真實月租分布、資料期間與樣本數；不會僅憑租金推論建物是否合法或整體是否安全。</p></div><div className="rounded-3xl border border-[color:var(--primary)]/20 bg-[color:var(--primary)]/8 p-5 text-sm leading-7 text-[color:var(--text-secondary)]">想快速了解完整流程，也可以載入左側展示案例。案例中的建物與屋況結果會清楚標示為示範資料。</div></div>;
+}
+
+function ConfirmationList() {
+  return <div className="space-y-4"><div><h4 className="text-lg font-semibold text-[color:var(--text-primary)]">其他風險仍需確認</h4><p className="mt-1 text-sm text-[color:var(--text-secondary)]">以下不是自動查詢結果，也不納入租金行情判定。</p></div>{confirmationItems.map((item) => <article key={item.title} className="rounded-2xl border border-amber-500/15 bg-amber-500/8 p-4"><p className="font-medium text-amber-100">{item.title}・尚未自動查證</p><p className="mt-2 text-sm leading-7 text-[color:var(--text-secondary)]">{item.detail}</p></article>)}</div>;
+}
+
+function DemoModules({ haunted, showHauntedRecord }: { haunted: typeof mockCheckResult.modules.haunted | typeof mockHauntedDangerResult.haunted; showHauntedRecord: boolean }) {
+  return <div className="space-y-4"><div className="rounded-3xl border border-red-500/15 bg-red-500/8 p-5 text-sm leading-7 text-red-100">{showHauntedRecord ? mockHauntedDangerResult.summary : mockCheckResult.summary}</div><div className="rounded-3xl border border-white/10 bg-white/[0.03] p-5"><div className="mb-4 flex flex-wrap items-center justify-between gap-3"><h4 className="text-lg font-semibold text-[color:var(--text-primary)]">建物與隔間情境</h4><SourceTag source="mock" /></div><div className="space-y-3">{mockCheckResult.modules.legality.items.map((item) => <article key={item.label} className="rounded-2xl border border-white/8 bg-black/20 p-4"><p className="font-medium text-[color:var(--text-primary)]">{item.label}</p><p className="mt-2 text-sm leading-7 text-[color:var(--text-secondary)]">{item.detail}</p></article>)}</div></div><div className="rounded-3xl border border-white/10 bg-white/[0.03] p-5"><div className="mb-3 flex flex-wrap items-center justify-between gap-3"><h4 className="text-lg font-semibold text-[color:var(--text-primary)]">{haunted.label}</h4><SourceTag source="mock" /></div><p className="text-sm leading-7 text-[color:var(--text-secondary)]">{haunted.detail}</p></div></div>;
 }

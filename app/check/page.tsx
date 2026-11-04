@@ -8,9 +8,9 @@ export default async function CheckPage({ searchParams }: PageProps<"/check">) {
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
       <section className="space-y-4">
         <p className="eyebrow">物件查核</p>
-        <h1 className="font-serif text-5xl leading-tight text-[color:var(--text-primary)]">租屋廣告先過濾，再決定要不要去看房</h1>
+        <h1 className="font-serif text-5xl leading-tight text-[color:var(--text-primary)]">輸入租屋條件，查看臺北市真實行情</h1>
         <p className="max-w-3xl text-base leading-8 text-[color:var(--text-secondary)]">
-          上傳截圖或貼上連結，60 秒取得體檢報告
+          對照內政部實價登錄租賃資料，了解同區同類型物件的月租分布與樣本數。
         </p>
       </section>
 

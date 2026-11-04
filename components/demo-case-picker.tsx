@@ -3,11 +3,12 @@ type DemoCasePickerProps = {
   selectedId: string | null;
   onLoad: (id: string) => void;
   onReset: () => void;
+  compact?: boolean;
 };
 
-export function DemoCasePicker({ cases, selectedId, onLoad, onReset }: DemoCasePickerProps) {
+export function DemoCasePicker({ cases, selectedId, onLoad, onReset, compact = false }: DemoCasePickerProps) {
   return (
-    <section className="panel p-6 sm:p-8">
+    <section className={compact ? "rounded-3xl border border-white/10 bg-white/[0.03] p-5" : "panel p-6 sm:p-8"}>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="eyebrow">展示模式</p>
