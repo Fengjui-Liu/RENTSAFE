@@ -127,3 +127,14 @@
    - FEATURES.md 的 F1、F3、F6、F8 狀態還是 Todo
    - 頁尾資料來源（`components/site-footer.tsx:7`）少了 CLAUDE.md 規定的「內政部住宅租賃契約書範本」
    - `app/contract/page.tsx:27` 的崔媽媽基金會網址還沒確認（LEGAL_CHECKLIST 待辦）
+
+## 7. 後續處理（2026-11-04 上午）
+
+- **第 6 節 (1) 首頁綠燈與補貼區塊**：已處理
+  - `beafe0b`：首頁「符合租金補貼基本條件／Safe」改為黃色「需自行確認」；「補貼資格 82%」改為「需自行確認」並移除百分比進度條；`/check` 待機說明不再寫「彙整補貼條件」
+- **第 6 節 (5) 文件同步**：已處理
+  - `b96cd29`：CLAUDE.md 摘要改為「建議謹慎評估」；docs/API.md 的 haunted 範例改為 `warning`／「凶宅風險提醒」；FEATURES.md 的 F1、F3、F6、F8 改為 Review；頁尾資料來源加上「內政部住宅租賃契約書範本」
+  - 崔媽媽基金會網址（`app/contract/page.tsx:27`）尚未確認，仍待辦
+- **第 3 節第 7 點 F3 loading 文字**：已處理
+  - `d234fbd`：貼上合約文字時，loading 標題改為「正在依住宅租賃契約書範本規則比對條款」
+- 第 6 節 (2)、(3)、(4) 維持原狀，仍待處理
