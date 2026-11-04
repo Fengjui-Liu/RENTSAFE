@@ -229,7 +229,9 @@ export function ContractDemo({ initialCaseId }: { initialCaseId?: string }) {
             <div className="space-y-6">
               <div>
                 <p className="eyebrow">審查中</p>
-                <h3 className="mt-3 font-serif text-3xl text-[color:var(--text-primary)]">AI 正在比對租賃契約風險</h3>
+                <h3 className="mt-3 font-serif text-3xl text-[color:var(--text-primary)]">
+                  {textResult ? "正在依住宅租賃契約書範本規則比對條款" : "AI 正在比對租賃契約風險"}
+                </h3>
               </div>
               <AnalysisSteps steps={contractLoadingSteps} />
             </div>
