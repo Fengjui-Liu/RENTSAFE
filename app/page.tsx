@@ -18,7 +18,7 @@ export default function Home() {
                 <span className="title-glow">看清你要租的房子</span>
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-[color:var(--text-secondary)]">
-                整合地政謄本、實價登錄與 AI 技術，讓每個學生都能像專業人士一樣看房
+                整合內政部實價登錄與住宅租賃契約書範本，讓每個學生都能像專業人士一樣看房
               </p>
             </div>
 
