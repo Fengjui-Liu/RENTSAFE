@@ -1,6 +1,9 @@
 import { CheckDemo } from "@/components/check-demo";
 
-export default function CheckPage() {
+export default async function CheckPage({ searchParams }: PageProps<"/check">) {
+  const { case: caseParam } = await searchParams;
+  const initialCaseId = typeof caseParam === "string" ? caseParam : undefined;
+
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
       <section className="space-y-4">
@@ -11,7 +14,7 @@ export default function CheckPage() {
         </p>
       </section>
 
-      <CheckDemo />
+      <CheckDemo key={initialCaseId ?? "default"} initialCaseId={initialCaseId} />
     </div>
   );
 }

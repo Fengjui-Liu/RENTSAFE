@@ -71,7 +71,7 @@ type DataSource = "real" | "rules" | "mock";
   "modules": {
     "legality": { "status": "warning", "items": [ { "label": "…", "status": "danger", "detail": "…" } ] },
     "pricing": { "status": "warning", "marketMedian": 7200, "listedPrice": 8000, "deviation": 11.1, "level": "偏高", "detail": "…", "source": "real" },
-    "haunted": { "status": "safe", "label": "凶宅查詢", "detail": "…", "source": "mock" }
+    "haunted": { "status": "warning", "label": "凶宅風險提醒", "detail": "…", "source": "mock" }
   },
   "summary": "…"
 }

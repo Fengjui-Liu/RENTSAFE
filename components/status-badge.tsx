@@ -11,7 +11,7 @@ const statusMap = {
   },
   danger: {
     className: "bg-red-500/12 text-red-300 ring-1 ring-red-500/20",
-    label: "違規",
+    label: "高風險",
   },
 } satisfies Record<Status, { className: string; label: string }>;
 
