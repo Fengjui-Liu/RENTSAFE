@@ -91,13 +91,11 @@ export default function Home() {
                       </div>
                     </div>
                     <div>
-                      <div className="mb-1 flex items-center justify-between text-xs text-emerald-200">
+                      <div className="mb-1 flex items-center justify-between text-xs text-amber-200">
                         <span>補貼資格</span>
-                        <span>82%</span>
+                        <span>需自行確認</span>
                       </div>
-                      <div className="h-2 rounded-full bg-white/8">
-                        <div className="h-2 w-[82%] rounded-full bg-[linear-gradient(90deg,#22c55e,#84cc16)]" />
-                      </div>
+                      <div className="h-2 rounded-full bg-white/8" />
                     </div>
                   </div>
                 </div>
@@ -117,12 +115,12 @@ export default function Home() {
                   </div>
                   <p className="text-sm leading-7 text-amber-50/85">高於區域中位數 11.1%</p>
                 </div>
-                <div className="rounded-2xl border border-emerald-500/15 bg-emerald-500/8 p-4 backdrop-blur-sm">
+                <div className="rounded-2xl border border-amber-500/15 bg-amber-500/8 p-4 backdrop-blur-sm">
                   <div className="mb-2 flex items-center justify-between">
-                    <p className="text-sm font-semibold text-emerald-200">符合租金補貼基本條件</p>
-                    <span className="text-[11px] uppercase tracking-[0.28em] text-emerald-300">Safe</span>
+                    <p className="text-sm font-semibold text-amber-200">租金補貼資格</p>
+                    <span className="text-[11px] uppercase tracking-[0.28em] text-amber-300">需自行確認</span>
                   </div>
-                  <p className="text-sm leading-7 text-emerald-50/85">符合基本申請條件，建議確認房東身份</p>
+                  <p className="text-sm leading-7 text-amber-50/85">補貼資格請依主管機關公告確認，本工具無法查證</p>
                 </div>
               </div>
             </div>

@@ -180,7 +180,7 @@ export function CheckDemo({ initialCaseId }: { initialCaseId?: string }) {
                 <p className="eyebrow">結果預覽</p>
                 <h3 className="font-serif text-3xl text-[color:var(--text-primary)]">讓風險先被看見</h3>
                 <p className="text-sm leading-7 text-[color:var(--text-secondary)]">
-                  系統會彙整建物合法性、租金合理性與補貼條件，輸出一張健康報告。
+                  系統會彙整建物合法性、租金合理性與凶宅風險提醒，輸出一張健康報告；補貼資格請依主管機關公告自行確認。
                 </p>
               </div>
 
