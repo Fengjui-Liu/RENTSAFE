@@ -11,12 +11,19 @@ export const navigationItems = [
 ] as const;
 
 export const propertyLoadingSteps = [
-  "正在解析物件資訊...",
-  "比對建物登記資料...",
-  "查核實價登錄租金行情...",
-  "產生體檢報告...",
+  "載入示範案例資料...",
+  "整理查核項目...",
+  "產生查核報告...",
 ] as const;
 
+// PDF 示範流程：只載入預設結果
+export const contractDemoLoadingSteps = [
+  "載入示範合約...",
+  "整理條款風險...",
+  "產生審查報告...",
+] as const;
+
+// 貼上合約文字（F3）：實際依範本規則比對
 export const contractLoadingSteps = [
   "正在解析合約內容...",
   "比對住宅租賃契約書範本...",

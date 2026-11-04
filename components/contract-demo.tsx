@@ -6,7 +6,7 @@ import { SourceTag } from "@/components/source-tag";
 import { StatusBadge } from "@/components/status-badge";
 import { DemoCasePicker } from "@/components/demo-case-picker";
 import { contractDemoCases, findContractDemoCase } from "@/data/demo-cases";
-import { contractLoadingSteps, mockContractResult } from "@/data/mock-data";
+import { contractDemoLoadingSteps, contractLoadingSteps, mockContractResult } from "@/data/mock-data";
 import { MAX_CONTRACT_TEXT_LENGTH, checkContractText, type ContractRulesResult } from "@/lib/contract-rules";
 
 type DemoState = "idle" | "loading" | "done";
@@ -233,7 +233,7 @@ export function ContractDemo({ initialCaseId }: { initialCaseId?: string }) {
                   {textResult ? "正在依住宅租賃契約書範本規則比對條款" : "正在載入示範合約的分析結果"}
                 </h3>
               </div>
-              <AnalysisSteps steps={contractLoadingSteps} />
+              <AnalysisSteps steps={textResult ? contractLoadingSteps : contractDemoLoadingSteps} />
             </div>
           )}
 
