@@ -143,7 +143,7 @@ export function TourExperience() {
 
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link href={tourHouse.checkHref} className="button-primary justify-center">
-              交給 RentSafe AI 查核
+              帶著這間房去查核
             </Link>
             <Link href={tourHouse.contractHref} className="button-secondary justify-center">
               檢查這份合約
