@@ -39,6 +39,9 @@ SHEET = "不動產租賃"
 PING_PER_M2 = 3.3058  # 1 平方公尺單價 × 3.3058 = 每坪單價
 MIN_SAMPLE = 10
 IQR_K = 1.5
+# 建物多樣性：棟數太少或最大一棟占比過高，中位數可能只反映少數房東的定價
+MIN_BUILDINGS = 8
+MAX_TOP_SHARE = 0.4
 HIGHLIGHT_DISTRICT = "文山區"
 
 TARGET_SUBJECT = "租賃房屋"
@@ -49,6 +52,7 @@ ROOM_SHARE_TYPES = {"分租套房", "分租雅房"}
 REQUIRED_COLS = [
     "鄉鎮市區", "交易標的", "建物型態", "出租型態", "總額元", "單價元平方公尺",
     "建物總面積平方公尺", "租賃年月日", "編號", "有無管理員", "有無附傢俱",
+    "土地位置建物門牌",
 ]
 
 PERIOD_NOTE = "租賃訂約日期，內政部實價登錄公開資料，非即時"
@@ -57,7 +61,10 @@ METHOD_NOTE = (
     "各行政區×出租型態以 IQR（1.5 倍）排除月租離群值後計算中位數與第 25、75 百分位；"
     f"樣本數少於 {MIN_SAMPLE} 標示樣本不足、不提供統計值；"
     "每坪月租 = 單價元平方公尺 × 3.3058；"
-    "分租套房、分租雅房的月租為單間租金，但建物總面積可能為整層面積，故僅提供月租、不提供每坪月租"
+    "分租套房、分租雅房的月租為單間租金，但建物總面積可能為整層面積，故僅提供月租、不提供每坪月租；"
+    f"以門牌（不含樓層與之幾）辨識建物，buildingCount 為不同建物棟數、topBuildingShare 為筆數最多一棟的占比，"
+    f"棟數少於 {MIN_BUILDINGS} 或最大一棟占比超過 {MAX_TOP_SHARE:.0%} 標示 lowDiversity；"
+    "lowDiversity 表示樣本集中於少數建物，僅供參考"
 )
 
 
@@ -96,6 +103,35 @@ def disp_width(s: str) -> int:
 def pad(s: str, width: int, right: bool = False) -> str:
     gap = " " * max(0, width - disp_width(s))
     return gap + s if right else s + gap
+
+
+_FLOOR_TAIL = re.compile(r"(地下.*|[\d一二三四五六七八九十百]+樓.*)$")
+
+
+def building_key(addr: str | float | None) -> str:
+    """門牌 → 建物鍵：全形轉半形，截到第一個「號」，去掉「之幾」；樓層與之幾一律不保留。
+    只在記憶體中用於計算棟數，不得輸出。"""
+    if addr is None or (isinstance(addr, float) and pd.isna(addr)):
+        return ""
+    s = unicodedata.normalize("NFKC", str(addr)).strip().replace(" ", "")
+    i = s.find("號")
+    if i >= 0:
+        s = s[: i + 1]
+        s = re.sub(r"之\d+號$", "號", s)  # 8之3號 → 8號（同一棟的分號）
+    else:
+        s = _FLOOR_TAIL.sub("", s)  # 沒有「號」：去掉樓層尾巴
+    return s
+
+
+def diversity(keys: pd.Series) -> dict:
+    vc = keys[keys != ""].value_counts()
+    count = int(len(vc))
+    top_share = round(float(vc.iloc[0]) / int(vc.sum()), 2) if count else 0.0
+    return {
+        "buildingCount": count,
+        "topBuildingShare": top_share,
+        "lowDiversity": count < MIN_BUILDINGS or top_share > MAX_TOP_SHARE,
+    }
 
 
 def quantiles(s: pd.Series) -> dict:
@@ -190,6 +226,8 @@ def clean(df: pd.DataFrame) -> pd.DataFrame:
     log_step("區／出租型態", n, len(df), "行政區或出租型態空白")
 
     df["per_ping"] = df["unit_m2"] * PING_PER_M2
+    df["_bkey"] = df["土地位置建物門牌"].map(building_key)
+    print(f"  建物鍵：{df['_bkey'].nunique()} 棟（無法辨識門牌 {(df['_bkey'] == '').sum()} 筆）")
     print(f"\n  篩選後共 {len(df)} 筆（原始 {n0} 筆，累計篩掉 {n0 - len(df)} 筆）")
 
     print_counts("有無管理員（篩選後，僅供參考，不分組不輸出）", df["有無管理員"])
@@ -215,11 +253,12 @@ def aggregate(df: pd.DataFrame) -> tuple[dict, list[dict]]:
         n_raw, n = len(g), len(kept)
         removed = n_raw - n
         total_outliers += removed
-        rows.append({"district": dist, "type": rtype, "raw": n_raw, "kept": n, "removed": removed})
+        div = diversity(kept["_bkey"])
+        rows.append({"district": dist, "type": rtype, "raw": n_raw, "kept": n, "removed": removed, **div})
         if n < MIN_SAMPLE:
-            entry = {"insufficient": True, "sampleSize": n}
+            entry = {"insufficient": True, "sampleSize": n, "buildingCount": div["buildingCount"]}
         else:
-            entry = {"sampleSize": n, "outliersRemoved": removed, "rent": quantiles(kept["rent"])}
+            entry = {"sampleSize": n, "outliersRemoved": removed, "rent": quantiles(kept["rent"]), **div}
             if rtype not in ROOM_SHARE_TYPES:
                 entry["perPing"] = quantiles(kept["per_ping"])
         districts.setdefault(dist, {})[rtype] = entry
@@ -256,6 +295,26 @@ def print_table(rows: list[dict]) -> None:
           + pad(str(sum(col_tot.values())), 8, right=True))
     if HIGHLIGHT_DISTRICT not in dists:
         print(f"  ⚠ 資料中沒有 {HIGHLIGHT_DISTRICT}")
+
+    print(f"\n【建物多樣性】每格：樣本數/棟數/最大一棟占比；⚠ = lowDiversity"
+          f"（棟數 < {MIN_BUILDINGS} 或最大一棟占比 > {MAX_TOP_SHARE}，僅計樣本數 ≥ {MIN_SAMPLE}）")
+    w = 18
+    header = pad("行政區", w0) + "".join(pad(t, w, right=True) for t in types)
+    print(header)
+    print("-" * disp_width(header))
+    for d in dists:
+        cells = []
+        for t in types:
+            r = lookup.get((d, t))
+            if r is None:
+                cells.append(pad("-", w, right=True))
+                continue
+            mark = "⚠" if r["kept"] >= MIN_SAMPLE and r["lowDiversity"] else " "
+            cells.append(pad(f"{r['kept']}/{r['buildingCount']}/{r['topBuildingShare']:.2f}{mark}", w, right=True))
+        flag = "  ◀ 文山區" if d == HIGHLIGHT_DISTRICT else ""
+        print(pad(d, w0) + "".join(cells) + flag)
+    low = [r for r in rows if r["kept"] >= MIN_SAMPLE and r["lowDiversity"]]
+    print(f"  lowDiversity 共 {len(low)} 組")
 
 
 # ---------- 主程式 ----------

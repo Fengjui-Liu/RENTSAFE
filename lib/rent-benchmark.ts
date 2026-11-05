@@ -6,13 +6,25 @@ export type RentalType = (typeof RENTAL_TYPES)[number];
 export type District = keyof typeof benchmarkData.districts;
 
 type RentStats = { median: number; p25: number; p75: number };
-type BenchmarkEntry = { insufficient?: boolean; sampleSize: number; outliersRemoved?: number; rent?: RentStats };
+type BenchmarkEntry = {
+  insufficient?: boolean;
+  sampleSize: number;
+  outliersRemoved?: number;
+  rent?: RentStats;
+  // 建物多樣性（舊版 JSON 沒有這些欄位）
+  buildingCount?: number;
+  topBuildingShare?: number;
+  lowDiversity?: boolean;
+};
 
 export type RentBenchmarkResult = {
   district: District;
   rentalType: RentalType;
   listedRent: number;
   sampleSize: number;
+  buildingCount?: number;
+  topBuildingShare?: number;
+  lowDiversity?: boolean;
   period: string;
   dataSource: string;
   method: string;
@@ -33,6 +45,9 @@ export function getRentBenchmark(district: District, rentalType: RentalType, lis
     rentalType,
     listedRent,
     sampleSize: entry?.sampleSize ?? 0,
+    buildingCount: entry?.buildingCount,
+    topBuildingShare: entry?.topBuildingShare,
+    lowDiversity: entry?.lowDiversity,
     period: RENT_BENCHMARK_PERIOD,
     dataSource: benchmarkData.dataSource,
     method: benchmarkData.method,

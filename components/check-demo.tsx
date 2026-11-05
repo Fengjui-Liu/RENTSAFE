@@ -143,6 +143,8 @@ function OverallReport({
             </p>
 
             <p>{summary}</p>
+
+            <SampleDiversity result={result} />
           </div>
         ) : (
           <p className="text-sm leading-7 text-amber-200">
@@ -277,6 +279,8 @@ function RentResult({
         />
       </div>
 
+      <SampleDiversity result={result} />
+
       <p className="text-sm leading-7 text-[color:var(--text-secondary)]">
         {result.detail}
       </p>
@@ -292,6 +296,31 @@ function RentResult({
         <p className="mt-2">{result.method}</p>
       </details>
     </div>
+  );
+}
+
+function SampleDiversity({
+  result,
+}: {
+  result: RentBenchmarkResult;
+}) {
+  if (result.buildingCount === undefined) return null;
+
+  const countText = `樣本 ${result.sampleSize} 筆，來自 ${result.buildingCount} 棟建物`;
+
+  if (result.lowDiversity) {
+    return (
+      <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-sm leading-6 text-amber-200">
+        <p className="font-medium">樣本集中於少數建物，僅供參考</p>
+        <p>{countText}</p>
+      </div>
+    );
+  }
+
+  return (
+    <p className="text-xs leading-6 text-[color:var(--text-muted)]">
+      {countText}
+    </p>
   );
 }
 
