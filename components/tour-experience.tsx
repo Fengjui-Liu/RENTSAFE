@@ -5,50 +5,111 @@ import { useState } from "react";
 import { tourHotspotCount, tourHouse, tourScenes, type TourScene } from "@/data/tour-data";
 
 function SceneIllustration({ sceneId }: { sceneId: TourScene["id"] }) {
-  const stroke = "rgba(255,255,255,0.22)";
-  const fill = "rgba(255,255,255,0.04)";
-  const accent = "rgba(249,115,22,0.35)";
-
   if (sceneId === "viewing") {
     return (
-      <svg viewBox="0 0 400 240" className="h-full w-full" aria-hidden="true">
-        <rect x="10" y="10" width="380" height="220" rx="16" fill={fill} stroke={stroke} />
-        <line x1="10" y1="190" x2="390" y2="190" stroke={stroke} />
-        <circle cx="88" cy="26" r="8" fill="none" stroke={accent} strokeWidth="2" />
-        <line x1="150" y1="60" x2="150" y2="190" stroke={stroke} strokeDasharray="6 6" />
-        <rect x="40" y="140" width="90" height="40" rx="8" fill="none" stroke={stroke} />
-        <rect x="215" y="105" width="70" height="85" rx="6" fill="none" stroke={stroke} />
-        <circle cx="272" cy="150" r="3" fill={stroke} />
-        <rect x="300" y="40" width="80" height="110" rx="6" fill="none" stroke={accent} />
-        <line x1="300" y1="80" x2="380" y2="80" stroke={accent} />
-        <path d="M300 40 L340 18 L380 40" fill="none" stroke={accent} />
+      <svg viewBox="0 0 400 240" className="pixel-scene h-full w-full" aria-hidden="true">
+        <rect width="400" height="240" fill="#111827" />
+        <rect y="168" width="400" height="72" fill="#35251f" />
+        <path d="M0 168H400M0 192H400M0 216H400M40 168V240M120 168V240M200 168V240M280 168V240M360 168V240" stroke="#593b2e" strokeWidth="2" />
+        <rect x="16" y="16" width="368" height="152" fill="#263449" stroke="#080b12" strokeWidth="6" />
+        <rect x="24" y="24" width="144" height="136" fill="#314158" />
+        <rect x="176" y="24" width="200" height="136" fill="#2b3a50" />
+        <rect x="188" y="38" width="82" height="66" fill="#172130" stroke="#080b12" strokeWidth="6" />
+        <rect x="194" y="44" width="70" height="54" fill="#7dc7d9" />
+        <rect x="194" y="76" width="70" height="22" fill="#e48b43" />
+        <path d="M226 44V98M194 70H264" stroke="#24344b" strokeWidth="4" />
+        <rect x="292" y="54" width="66" height="106" fill="#654838" stroke="#080b12" strokeWidth="6" />
+        <rect x="300" y="62" width="50" height="98" fill="#82614b" />
+        <rect x="338" y="108" width="6" height="6" fill="#ffd36a" />
+        <g className="pixel-drip">
+          <rect x="280" y="128" width="6" height="12" fill="#65d2e8" />
+          <rect x="280" y="144" width="6" height="6" fill="#65d2e8" />
+        </g>
+        <rect x="42" y="119" width="106" height="49" fill="#151b28" stroke="#080b12" strokeWidth="6" />
+        <rect x="50" y="126" width="90" height="34" fill="#df6e3b" />
+        <rect x="56" y="136" width="36" height="18" fill="#f2a65a" />
+        <g className="pixel-alarm">
+          <rect x="74" y="30" width="34" height="10" fill="#080b12" />
+          <rect x="80" y="34" width="22" height="12" fill="#f5f3e8" />
+          <rect x="88" y="38" width="6" height="6" fill="#ef4444" />
+        </g>
+        <g className="pixel-character pixel-character-walk">
+          <rect x="182" y="122" width="18" height="18" fill="#f2b38b" />
+          <rect x="178" y="140" width="26" height="24" fill="#f97316" />
+          <rect x="180" y="164" width="8" height="20" fill="#cbd5e1" />
+          <rect x="194" y="164" width="8" height="20" fill="#cbd5e1" />
+          <rect x="178" y="184" width="12" height="6" fill="#080b12" />
+          <rect x="194" y="184" width="12" height="6" fill="#080b12" />
+        </g>
       </svg>
     );
   }
 
   if (sceneId === "landlord") {
     return (
-      <svg viewBox="0 0 400 240" className="h-full w-full" aria-hidden="true">
-        <rect x="10" y="10" width="380" height="220" rx="16" fill={fill} stroke={stroke} />
-        <circle cx="120" cy="120" r="22" fill="none" stroke={stroke} />
-        <path d="M80 200 Q120 150 160 200" fill="none" stroke={stroke} />
-        <circle cx="280" cy="120" r="22" fill="none" stroke={accent} />
-        <path d="M240 200 Q280 150 320 200" fill="none" stroke={accent} />
-        <rect x="70" y="40" width="110" height="40" rx="12" fill="none" stroke={stroke} />
-        <rect x="220" y="34" width="120" height="40" rx="12" fill="none" stroke={accent} />
+      <svg viewBox="0 0 400 240" className="pixel-scene h-full w-full" aria-hidden="true">
+        <rect width="400" height="240" fill="#151b2b" />
+        <rect y="166" width="400" height="74" fill="#443026" />
+        <rect x="20" y="20" width="360" height="146" fill="#283750" stroke="#080b12" strokeWidth="6" />
+        <rect x="36" y="38" width="104" height="74" fill="#172130" stroke="#080b12" strokeWidth="6" />
+        <rect x="44" y="46" width="88" height="58" fill="#e7934c" />
+        <rect x="52" y="54" width="30" height="42" fill="#f8c66d" />
+        <rect x="90" y="62" width="34" height="34" fill="#d96b3e" />
+        <g className="pixel-bubble">
+          <rect x="66" y="18" width="112" height="36" fill="#fff8e8" stroke="#080b12" strokeWidth="5" />
+          <rect x="88" y="50" width="12" height="10" fill="#fff8e8" />
+          <rect x="78" y="29" width="74" height="5" fill="#5f6574" />
+          <rect x="78" y="40" width="52" height="5" fill="#f97316" />
+        </g>
+        <g className="pixel-bubble pixel-bubble-delay">
+          <rect x="228" y="22" width="112" height="36" fill="#fff8e8" stroke="#080b12" strokeWidth="5" />
+          <rect x="304" y="54" width="12" height="10" fill="#fff8e8" />
+          <rect x="242" y="33" width="78" height="5" fill="#5f6574" />
+          <rect x="258" y="44" width="62" height="5" fill="#ef4444" />
+        </g>
+        <rect x="70" y="150" width="260" height="24" fill="#8b5b3f" stroke="#080b12" strokeWidth="6" />
+        <rect x="104" y="174" width="14" height="50" fill="#60402f" />
+        <rect x="282" y="174" width="14" height="50" fill="#60402f" />
+        <g className="pixel-character pixel-character-talk">
+          <rect x="102" y="96" width="24" height="24" fill="#f2b38b" />
+          <rect x="98" y="120" width="32" height="34" fill="#3b82f6" />
+          <rect x="104" y="154" width="8" height="32" fill="#cbd5e1" />
+          <rect x="118" y="154" width="8" height="32" fill="#cbd5e1" />
+        </g>
+        <g className="pixel-character pixel-character-talk pixel-character-talk-delay">
+          <rect x="274" y="96" width="24" height="24" fill="#d69b76" />
+          <rect x="270" y="120" width="32" height="34" fill="#f97316" />
+          <rect x="276" y="154" width="8" height="32" fill="#334155" />
+          <rect x="290" y="154" width="8" height="32" fill="#334155" />
+        </g>
       </svg>
     );
   }
 
   return (
-    <svg viewBox="0 0 400 240" className="h-full w-full" aria-hidden="true">
-      <rect x="10" y="10" width="380" height="220" rx="16" fill={fill} stroke={stroke} />
-      <rect x="40" y="150" width="320" height="16" rx="4" fill="none" stroke={stroke} />
-      <rect x="110" y="40" width="180" height="140" rx="6" fill="rgba(255,255,255,0.05)" stroke={stroke} />
-      {[64, 84, 104, 124, 144].map((y) => (
-        <line key={y} x1="130" y1={y} x2="270" y2={y} stroke={stroke} />
+    <svg viewBox="0 0 400 240" className="pixel-scene h-full w-full" aria-hidden="true">
+      <rect width="400" height="240" fill="#121827" />
+      <rect y="174" width="400" height="66" fill="#3b2a22" />
+      <rect x="18" y="18" width="364" height="156" fill="#26364d" stroke="#080b12" strokeWidth="6" />
+      <rect x="98" y="34" width="204" height="146" fill="#f4ead5" stroke="#080b12" strokeWidth="7" />
+      <rect x="110" y="46" width="180" height="122" fill="#fffaf0" />
+      {[58, 72, 86, 100, 114, 128, 142].map((y) => (
+        <rect key={y} x="124" y={y} width={y === 100 ? 112 : 150} height="4" fill="#8b93a1" />
       ))}
-      <line x1="300" y1="190" x2="340" y2="130" stroke={accent} strokeWidth="4" strokeLinecap="round" />
+      <g className="pixel-highlight">
+        <rect x="116" y="50" width="168" height="25" fill="#f97316" opacity="0.25" />
+      </g>
+      <rect x="30" y="174" width="340" height="26" fill="#885b3f" stroke="#080b12" strokeWidth="6" />
+      <rect x="54" y="200" width="16" height="40" fill="#5d3d2d" />
+      <rect x="330" y="200" width="16" height="40" fill="#5d3d2d" />
+      <g className="pixel-pen">
+        <rect x="306" y="128" width="8" height="66" fill="#080b12" transform="rotate(36 310 161)" />
+        <rect x="309" y="130" width="5" height="54" fill="#f97316" transform="rotate(36 311 157)" />
+      </g>
+      <g className="pixel-stamp">
+        <rect x="56" y="128" width="34" height="28" fill="#ef4444" stroke="#080b12" strokeWidth="5" />
+        <rect x="62" y="118" width="22" height="12" fill="#f6c453" stroke="#080b12" strokeWidth="4" />
+      </g>
     </svg>
   );
 }
@@ -157,7 +218,7 @@ export function TourExperience() {
         <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
           <div>
             <p className="mb-3 text-sm text-[color:var(--text-secondary)]">{scene.description}</p>
-            <div className="relative aspect-[5/3] w-full">
+            <div className="tour-pixel-frame relative aspect-[5/3] w-full overflow-hidden">
               <SceneIllustration sceneId={scene.id} />
               {scene.hotspots.map((hotspot, index) => {
                 const visited = visitedIds.includes(hotspot.id);

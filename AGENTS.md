@@ -3,3 +3,14 @@
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
+
+## 專案更新紀錄
+
+### 2026-11-05
+
+- 完成 F2 真實租金行情串接：`/check` 可依臺北市行政區、出租型態與月租，比對實價登錄租賃資料的中位數、P25／P75、樣本數與資料期別。
+- 移除 `next/font/google` 的建置期網路依賴，改用跨平台系統中文字型，讓專案在離線環境也能執行 `npm run build`。
+- 調整 F3 合約規則測試流程，使 Node.js 20 可執行；新增 `npm run test:contracts`，三組示範合約案例均通過。
+- 將 `/tour` 情境看房改造成像素風互動教學：保留三個場景與 12 個法規熱點，加入角色巡房、警報器、漏水、對話、寫字與蓋章等循環動畫。
+- 像素動畫支援 `prefers-reduced-motion`，使用者啟用「減少動態效果」時會停止動畫。
+- 本日驗證：`npm run lint`、`npx tsc --noEmit`、`npm run test:contracts`、`npm run build` 與 `git diff --check` 均通過。

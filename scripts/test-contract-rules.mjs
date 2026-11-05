@@ -1,7 +1,45 @@
-// F3 規則引擎驗證：node scripts/test-contract-rules.mjs
-// 需要 Node 22.18 以上（內建 TypeScript 型別移除），不需要額外套件。
-import { checkContractText } from "../lib/contract-rules.ts";
-import { contractSamples } from "../data/contract-samples.ts";
+// F3 規則引擎驗證：npm run test:contracts
+// 先用專案既有的 TypeScript 編譯器輸出到系統暫存目錄，Node.js 20 即可執行。
+import { execFileSync } from "node:child_process";
+import { createRequire } from "node:module";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const compileDirectory = mkdtempSync(join(tmpdir(), "rentsafe-contract-test-"));
+const require = createRequire(import.meta.url);
+
+let checkContractText;
+let contractSamples;
+
+try {
+  execFileSync(
+    join(projectRoot, "node_modules", ".bin", "tsc"),
+    [
+      "lib/contract-rules.ts",
+      "data/contract-samples.ts",
+      "--outDir",
+      compileDirectory,
+      "--module",
+      "commonjs",
+      "--moduleResolution",
+      "node",
+      "--target",
+      "ES2020",
+      "--esModuleInterop",
+      "--skipLibCheck",
+    ],
+    { cwd: projectRoot, stdio: "inherit" },
+  );
+
+  ({ checkContractText } = require(join(compileDirectory, "lib", "contract-rules.js")));
+  ({ contractSamples } = require(join(compileDirectory, "data", "contract-samples.js")));
+} catch (error) {
+  rmSync(compileDirectory, { recursive: true, force: true });
+  throw error;
+}
 
 const expected = {
   "text-common-risks": ["R1", "R13", "R6", "R11", "R15", "R16"],
@@ -33,4 +71,5 @@ const empty = checkContractText("");
 console.log(`\n## 空字串：命中 ${empty.clauses.length} 條，riskLevel=${empty.riskLevel}`);
 
 console.log(failed === 0 ? "\n全部通過" : `\n${failed} 組未通過`);
+rmSync(compileDirectory, { recursive: true, force: true });
 process.exit(failed === 0 ? 0 : 1);
