@@ -1,48 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useState } from "react";
 import { tourHotspotCount, tourHouse, tourScenes, type TourScene } from "@/data/tour-data";
 
+const TourViewingScene = dynamic(() => import("@/components/tour-viewing-scene"), {
+  ssr: false,
+  loading: () => <div className="h-full w-full animate-pulse bg-[#b8d8e8]" aria-hidden="true" />,
+});
+
 function SceneIllustration({ sceneId }: { sceneId: TourScene["id"] }) {
   if (sceneId === "viewing") {
-    return (
-      <svg viewBox="0 0 400 240" className="pixel-scene h-full w-full" aria-hidden="true">
-        <rect width="400" height="240" fill="#111827" />
-        <rect y="168" width="400" height="72" fill="#35251f" />
-        <path d="M0 168H400M0 192H400M0 216H400M40 168V240M120 168V240M200 168V240M280 168V240M360 168V240" stroke="#593b2e" strokeWidth="2" />
-        <rect x="16" y="16" width="368" height="152" fill="#263449" stroke="#080b12" strokeWidth="6" />
-        <rect x="24" y="24" width="144" height="136" fill="#314158" />
-        <rect x="176" y="24" width="200" height="136" fill="#2b3a50" />
-        <rect x="188" y="38" width="82" height="66" fill="#172130" stroke="#080b12" strokeWidth="6" />
-        <rect x="194" y="44" width="70" height="54" fill="#7dc7d9" />
-        <rect x="194" y="76" width="70" height="22" fill="#e48b43" />
-        <path d="M226 44V98M194 70H264" stroke="#24344b" strokeWidth="4" />
-        <rect x="292" y="54" width="66" height="106" fill="#654838" stroke="#080b12" strokeWidth="6" />
-        <rect x="300" y="62" width="50" height="98" fill="#82614b" />
-        <rect x="338" y="108" width="6" height="6" fill="#ffd36a" />
-        <g className="pixel-drip">
-          <rect x="280" y="128" width="6" height="12" fill="#65d2e8" />
-          <rect x="280" y="144" width="6" height="6" fill="#65d2e8" />
-        </g>
-        <rect x="42" y="119" width="106" height="49" fill="#151b28" stroke="#080b12" strokeWidth="6" />
-        <rect x="50" y="126" width="90" height="34" fill="#df6e3b" />
-        <rect x="56" y="136" width="36" height="18" fill="#f2a65a" />
-        <g className="pixel-alarm">
-          <rect x="74" y="30" width="34" height="10" fill="#080b12" />
-          <rect x="80" y="34" width="22" height="12" fill="#f5f3e8" />
-          <rect x="88" y="38" width="6" height="6" fill="#ef4444" />
-        </g>
-        <g className="pixel-character pixel-character-walk">
-          <rect x="182" y="122" width="18" height="18" fill="#f2b38b" />
-          <rect x="178" y="140" width="26" height="24" fill="#f97316" />
-          <rect x="180" y="164" width="8" height="20" fill="#cbd5e1" />
-          <rect x="194" y="164" width="8" height="20" fill="#cbd5e1" />
-          <rect x="178" y="184" width="12" height="6" fill="#080b12" />
-          <rect x="194" y="184" width="12" height="6" fill="#080b12" />
-        </g>
-      </svg>
-    );
+    return <TourViewingScene />;
   }
 
   if (sceneId === "landlord") {
@@ -218,7 +188,7 @@ export function TourExperience() {
         <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
           <div>
             <p className="mb-3 text-sm text-[color:var(--text-secondary)]">{scene.description}</p>
-            <div className="tour-pixel-frame relative aspect-[5/3] w-full overflow-hidden">
+            <div className={`relative aspect-[5/3] w-full overflow-hidden ${scene.id === "viewing" ? "tour-3d-frame" : "tour-pixel-frame"}`}>
               <SceneIllustration sceneId={scene.id} />
               {scene.hotspots.map((hotspot, index) => {
                 const visited = visitedIds.includes(hotspot.id);
