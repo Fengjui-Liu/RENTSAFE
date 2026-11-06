@@ -223,6 +223,22 @@ body {
   touch-action: pan-y;
 }
 
+.tour-hotspot-dialog {
+  right: 0.75rem;
+  bottom: 0.75rem;
+  left: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .tour-hotspot-dialog {
+    top: min(calc(var(--hotspot-y) - 3rem), 45%);
+    right: auto;
+    bottom: auto;
+    left: min(calc(var(--hotspot-x) + 3.5rem), calc(100% - min(20rem, 46%) - 1.25rem));
+    width: min(20rem, 46%);
+  }
+}
+
 .pixel-scene {
   display: block;
   shape-rendering: crispEdges;
