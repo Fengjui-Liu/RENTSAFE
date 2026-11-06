@@ -1,21 +1,121 @@
 import Link from "next/link";
 import { SourceTag } from "@/components/source-tag";
-import { featureCards } from "@/data/mock-data";
+import { findCheckDemoCase } from "@/data/demo-cases";
+import { featureCards, mockCheckResult, type DataSource, type Status } from "@/data/mock-data";
+import { getRentBenchmark } from "@/lib/rent-benchmark";
+
+// 首頁預覽：用 F1 展示案例組出卡片，查核摘要的數字一律由下方卡片計算，不另寫死
+type PreviewLevel = "high" | "attention" | "self";
+
+type PreviewCard = {
+  title: string;
+  detail: string;
+  level: PreviewLevel | null; // null：位於行情區間等，不計入摘要
+  source: DataSource;
+  period?: string;
+  sampleSize?: number;
+};
+
+const levelLabel = {
+  high: "高風險",
+  attention: "需注意",
+  self: "需自行確認",
+} satisfies Record<PreviewLevel, string>;
+
+const levelStyle = {
+  high: { card: "border-red-500/25 bg-red-500/8", label: "text-red-300" },
+  attention: { card: "border-amber-500/25 bg-amber-500/8", label: "text-amber-300" },
+  self: { card: "border-amber-500/25 bg-amber-500/8", label: "text-amber-300" },
+} satisfies Record<PreviewLevel, { card: string; label: string }>;
+
+function statusToLevel(status: Status): PreviewLevel | null {
+  if (status === "danger") return "high";
+  if (status === "warning") return "attention";
+  return null;
+}
+
+const formatRent = (value: number) => `${value.toLocaleString("zh-TW")} 元`;
+
+function buildPreview() {
+  const demoCase = findCheckDemoCase("wenshan-studio");
+  if (!demoCase) throw new Error("首頁預覽：找不到 F1 預設案例");
+
+  const legality = mockCheckResult.modules.legality.items;
+  const illegalBuild = legality.find((item) => item.label === "違建查核");
+  if (!illegalBuild) throw new Error("首頁預覽：示範資料缺少違建查核");
+
+  const rent = getRentBenchmark(demoCase.district, demoCase.rentalType, demoCase.listedRent);
+  const rentPlace = `${rent.district}${rent.rentalType}`;
+  const sampleText =
+    rent.buildingCount !== undefined
+      ? `樣本 ${rent.sampleSize} 筆，來自 ${rent.buildingCount} 棟建物`
+      : `樣本 ${rent.sampleSize} 筆`;
+
+  const rentCard: PreviewCard =
+    rent.kind === "ready"
+      ? {
+          title: `月租 ${formatRent(rent.listedRent)}，${rent.label}`,
+          detail: `${rentPlace}中位數 ${formatRent(rent.rent.median)}（${
+            rent.deviation >= 0 ? "高於" : "低於"
+          } ${Math.abs(rent.deviation)}%），第 25–75 百分位 ${formatRent(rent.rent.p25)}–${formatRent(
+            rent.rent.p75,
+          )}；${sampleText}${rent.lowDiversity ? "，樣本集中於少數建物，僅供參考" : ""}`,
+          level: statusToLevel(rent.status),
+          source: "real",
+          period: rent.period,
+          sampleSize: rent.sampleSize,
+        }
+      : {
+          title: `月租 ${formatRent(rent.listedRent)}，樣本不足`,
+          detail: `${rentPlace}有效樣本不足，不判定行情高低`,
+          level: "self",
+          source: "real",
+          period: rent.period,
+          sampleSize: rent.sampleSize,
+        };
+
+  const cards: PreviewCard[] = [
+    {
+      title: "違建與樓層資訊不一致",
+      detail: "建物使用執照登記為 4 樓，廣告物件位於 5 樓，疑似頂樓加蓋",
+      level: statusToLevel(illegalBuild.status),
+      source: "mock",
+    },
+    rentCard,
+    {
+      title: "租金補貼資格",
+      detail: "補貼資格請依主管機關公告確認，本工具無法查證",
+      level: "self",
+      source: "mock",
+    },
+  ];
+
+  const count = (level: PreviewLevel) => cards.filter((card) => card.level === level).length;
+
+  return {
+    title: demoCase.title,
+    period: rent.period,
+    cards,
+    counts: { high: count("high"), attention: count("attention"), self: count("self") },
+  };
+}
 
 export default function Home() {
+  const preview = buildPreview();
+
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-20 px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
-      <section className="hero-panel overflow-hidden">
-        <div className="relative grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+      <section className="hero-panel">
+        <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div className="space-y-8 animate-enter">
             <div className="space-y-4">
-              <div className="inline-flex items-center gap-3 rounded-full border border-[color:var(--primary)]/20 bg-[color:var(--primary)]/8 px-4 py-2 text-xs font-semibold tracking-[0.28em] text-[color:var(--primary-soft)]">
-                <span className="inline-flex h-2 w-2 rounded-full bg-[color:var(--primary)] shadow-[0_0_18px_rgba(249,115,22,0.95)]" />
+              <div className="inline-flex items-center gap-3 rounded-full border border-[color:var(--primary)]/30 px-4 py-2 text-sm font-semibold text-[color:var(--primary-soft)]">
+                <span className="inline-flex h-2 w-2 rounded-full bg-[color:var(--primary)]" />
                 AI 租屋風險查核
               </div>
               <h1 className="max-w-3xl font-serif text-5xl leading-tight text-[color:var(--text-primary)] sm:text-6xl">
                 60 秒，
-                <span className="title-glow">看清你要租的房子</span>
+                <span className="title-accent">看清你要租的房子</span>
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-[color:var(--text-secondary)]">
                 整合內政部實價登錄與住宅租賃契約書範本，讓每個學生都能像專業人士一樣看房
@@ -47,82 +147,45 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="relative animate-enter-delayed">
-            <div className="absolute inset-0 -z-10 rounded-[36px] bg-[radial-gradient(circle_at_top,rgba(249,115,22,0.24),transparent_58%)] blur-2xl" />
-            <div className="scan-grid absolute inset-x-8 top-8 -z-10 h-64 rounded-[32px] opacity-60" />
-            <div className="panel relative overflow-hidden p-6 lg:p-7">
-              <div className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(249,115,22,0.8),transparent)]" />
-              <div className="mb-6 flex items-center justify-between">
-                <p className="text-sm text-[color:var(--text-secondary)]">物件健康分數</p>
-                <div className="flex items-center gap-2">
-                  <SourceTag source="mock" />
-                  <span className="rounded-full bg-red-500/12 px-3 py-1 text-xs font-semibold text-red-300">
-                    高風險
-                  </span>
-                </div>
-              </div>
-              <div className="mb-8 grid gap-4 sm:grid-cols-[0.9fr_1.1fr] sm:items-end">
-                <div>
-                  <p className="text-6xl font-semibold text-[color:var(--text-primary)]">63</p>
-                  <p className="mt-2 text-sm text-[color:var(--text-secondary)]">台北市文山區學生套房樣本</p>
-                </div>
-                <div className="rounded-[28px] border border-[color:var(--primary)]/16 bg-[linear-gradient(180deg,rgba(249,115,22,0.14),rgba(255,255,255,0.03))] p-4">
-                  <div className="mb-3 flex items-center justify-between text-xs uppercase tracking-[0.28em] text-[color:var(--text-muted)]">
-                    <span>風險分布</span>
-                    <span>更新中</span>
+          {/* 預覽：外層容器（panel）＋內容區（卡片），最多兩層 */}
+          <div className="panel animate-enter-delayed p-6 lg:p-7">
+            <div className="mb-5 space-y-2">
+              <p className="text-sm text-[color:var(--text-secondary)]">查核摘要・{preview.title}（展示案例）</p>
+              <p className="text-2xl font-semibold text-[color:var(--text-primary)]">
+                <span className="text-red-300">高風險 {preview.counts.high} 項</span>
+                <span className="text-[color:var(--text-muted)]">・</span>
+                <span className="text-amber-300">需注意 {preview.counts.attention} 項</span>
+              </p>
+              {preview.counts.self > 0 && (
+                <p className="text-sm text-[color:var(--text-secondary)]">另有 {preview.counts.self} 項需自行確認</p>
+              )}
+              <p className="text-sm text-[color:var(--text-secondary)]">
+                來源：租金為內政部實價登錄（{preview.period}）；其餘為示範資料
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              {preview.cards.map((card) => (
+                <div
+                  key={card.title}
+                  className={`rounded-2xl border p-4 ${
+                    card.level ? levelStyle[card.level].card : "border-white/10 bg-white/[0.03]"
+                  }`}
+                >
+                  <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
+                    <p className="font-semibold text-[color:var(--text-primary)]">{card.title}</p>
+                    {card.level && (
+                      <span className={`text-sm font-semibold ${levelStyle[card.level].label}`}>
+                        {levelLabel[card.level]}
+                      </span>
+                    )}
                   </div>
-                  <div className="space-y-3">
-                    <div>
-                      <div className="mb-1 flex items-center justify-between text-xs text-red-200">
-                        <span>高風險項目</span>
-                        <span>76%</span>
-                      </div>
-                      <div className="h-2 rounded-full bg-white/8">
-                        <div className="h-2 w-[76%] rounded-full bg-[linear-gradient(90deg,#ef4444,#f97316)]" />
-                      </div>
-                    </div>
-                    <div>
-                      <div className="mb-1 flex items-center justify-between text-xs text-amber-200">
-                        <span>租金溢價</span>
-                        <span>61%</span>
-                      </div>
-                      <div className="h-2 rounded-full bg-white/8">
-                        <div className="h-2 w-[61%] rounded-full bg-[linear-gradient(90deg,#eab308,#f97316)]" />
-                      </div>
-                    </div>
-                    <div>
-                      <div className="mb-1 flex items-center justify-between text-xs text-amber-200">
-                        <span>補貼資格</span>
-                        <span>需自行確認</span>
-                      </div>
-                      <div className="h-2 rounded-full bg-white/8" />
-                    </div>
+                  <p className="text-sm leading-7 text-[color:var(--text-secondary)]">{card.detail}</p>
+                  <div className="mt-3">
+                    <SourceTag source={card.source} period={card.period} sampleSize={card.sampleSize} />
                   </div>
                 </div>
-              </div>
-              <div className="space-y-4">
-                <div className="rounded-2xl border border-red-500/15 bg-red-500/8 p-4 backdrop-blur-sm">
-                  <div className="mb-2 flex items-center justify-between">
-                    <p className="text-sm font-semibold text-red-200">違建與樓層資訊不一致</p>
-                    <span className="text-[11px] uppercase tracking-[0.28em] text-red-300">Danger</span>
-                  </div>
-                  <p className="text-sm leading-7 text-red-50/85">疑似頂樓加蓋違建</p>
-                </div>
-                <div className="rounded-2xl border border-amber-500/15 bg-amber-500/8 p-4 backdrop-blur-sm">
-                  <div className="mb-2 flex items-center justify-between">
-                    <p className="text-sm font-semibold text-amber-200">租金高於區域中位數 11.1%</p>
-                    <span className="text-[11px] uppercase tracking-[0.28em] text-amber-300">Warning</span>
-                  </div>
-                  <p className="text-sm leading-7 text-amber-50/85">高於區域中位數 11.1%</p>
-                </div>
-                <div className="rounded-2xl border border-amber-500/15 bg-amber-500/8 p-4 backdrop-blur-sm">
-                  <div className="mb-2 flex items-center justify-between">
-                    <p className="text-sm font-semibold text-amber-200">租金補貼資格</p>
-                    <span className="text-[11px] uppercase tracking-[0.28em] text-amber-300">需自行確認</span>
-                  </div>
-                  <p className="text-sm leading-7 text-amber-50/85">補貼資格請依主管機關公告確認，本工具無法查證</p>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
@@ -141,13 +204,12 @@ export default function Home() {
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {featureCards.map((card, index) => (
-            <Link key={card.title} href={card.href} className="feature-card group block p-6 transition hover:-translate-y-1">
+            <Link key={card.title} href={card.href} className="feature-card group block p-6">
               <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[color:var(--primary)]/12 text-lg font-semibold text-[color:var(--primary)]">
                 0{index + 1}
               </div>
               <h3 className="font-serif text-2xl text-[color:var(--text-primary)]">{card.title}</h3>
               <p className="mt-3 text-sm leading-7 text-[color:var(--text-secondary)]">{card.description}</p>
-              <div className="mt-8 h-px bg-[linear-gradient(90deg,rgba(249,115,22,0.45),transparent)]" />
             </Link>
           ))}
         </div>

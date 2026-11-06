@@ -248,7 +248,7 @@ export function ListingImageUpload({
       />
 
       {imageUrl && (
-        <div className="rounded-xl border border-white/10 p-3">
+        <div>
           <img
             src={imageUrl}
             alt="租屋廣告截圖預覽"
@@ -261,7 +261,7 @@ export function ListingImageUpload({
         type="button"
         onClick={recognizeImage}
         disabled={!file || loading}
-        className="w-full rounded-full bg-orange-600 px-5 py-3 font-semibold text-white transition hover:bg-orange-500 disabled:opacity-50"
+        className="w-full rounded-full bg-orange-700 px-5 py-3 font-semibold text-white transition hover:bg-orange-800 disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-gray-300"
       >
         {loading ? "正在辨識圖片..." : "開始辨識截圖"}
       </button>
@@ -273,7 +273,7 @@ export function ListingImageUpload({
       )}
 
       {recognizedInfo && (
-        <div className="space-y-3 rounded-2xl border border-orange-500/20 bg-orange-500/5 p-4">
+        <div className="space-y-3 border-t border-white/10 pt-4">
           <h3 className="font-semibold text-white">
             自動擷取結果
           </h3>
@@ -325,7 +325,7 @@ export function ListingImageUpload({
             查看完整 OCR 辨識文字
           </summary>
 
-          <pre className="mt-3 max-h-80 overflow-auto whitespace-pre-wrap rounded-xl bg-black/30 p-4 text-sm text-gray-200">
+          <pre className="mt-3 max-h-80 overflow-auto whitespace-pre-wrap border-l-2 border-white/15 pl-4 text-sm text-gray-200">
             {text}
           </pre>
         </details>

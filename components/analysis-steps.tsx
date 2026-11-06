@@ -31,10 +31,10 @@ export function AnalysisSteps({ steps }: AnalysisStepsProps) {
           className={`flex items-center gap-3 rounded-2xl border px-4 py-3 text-sm transition duration-500 ${
             index < visibleCount
               ? "border-[color:var(--primary)]/20 bg-[color:var(--primary)]/8 text-[color:var(--text-primary)] opacity-100"
-              : "border-white/8 bg-white/[0.02] text-[color:var(--text-muted)] opacity-30"
+              : "border-white/8 bg-white/[0.02] text-[color:var(--text-muted)]"
           }`}
         >
-          <span className="inline-flex h-2.5 w-2.5 rounded-full bg-[color:var(--primary)] shadow-[0_0_18px_rgba(249,115,22,0.75)]" />
+          <span className="inline-flex h-2.5 w-2.5 rounded-full bg-[color:var(--primary)]" />
           <span>{step}</span>
         </div>
       ))}

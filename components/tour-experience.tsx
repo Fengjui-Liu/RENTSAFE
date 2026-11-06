@@ -237,7 +237,7 @@ export function TourExperience() {
                         ? "border-[color:var(--primary)] bg-[color:var(--primary)] text-white"
                         : visited
                           ? "border-[color:var(--primary)]/40 bg-black/70 text-[color:var(--primary-soft)]"
-                          : "border-white/20 bg-black/70 text-[color:var(--text-primary)] shadow-[0_0_18px_rgba(249,115,22,0.45)]"
+                          : "border-white/20 bg-black/70 text-[color:var(--text-primary)]"
                     }`}
                   >
                     <span>{visited ? "✓" : index + 1}</span>

@@ -176,7 +176,7 @@ function OverallReport({
         </p>
       </div>
 
-      <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+      <div className="border-t border-white/10 pt-4">
         <p className="text-xs leading-6 text-[color:var(--text-muted)]">
           資料來源：
           {mode === "demo"
@@ -205,7 +205,7 @@ function RentResult({
 }) {
   if (result.kind === "unavailable") {
     return (
-      <div className="rounded-3xl border border-amber-500/20 bg-amber-500/8 p-5 text-sm leading-7 text-amber-100">
+      <div className="border-l-2 border-amber-500/60 pl-4 text-sm leading-7 text-amber-100">
         目前沒有「{result.district}・{result.rentalType}」的可用樣本，
         因此不判定行情高低。你可以改選其他出租型態。
       </div>
@@ -214,7 +214,7 @@ function RentResult({
 
   if (result.kind === "insufficient") {
     return (
-      <div className="space-y-3 rounded-3xl border border-amber-500/20 bg-amber-500/8 p-5 text-sm leading-7 text-amber-100">
+      <div className="space-y-3 border-l-2 border-amber-500/60 pl-4 text-sm leading-7 text-amber-100">
         <p>
           目前只有 {result.sampleSize} 筆有效樣本，
           少於最低門檻 10 筆，因此不提供中位數或行情判定。
@@ -310,7 +310,7 @@ function SampleDiversity({
 
   if (result.lowDiversity) {
     return (
-      <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-sm leading-6 text-amber-200">
+      <div className="border-l-2 border-amber-500/60 pl-3 text-sm leading-6 text-amber-200">
         <p className="font-medium">樣本集中於少數建物，僅供參考</p>
         <p>{countText}</p>
       </div>
@@ -334,7 +334,7 @@ function Metric({
   small?: boolean;
 }) {
   return (
-    <div className="rounded-2xl border border-white/8 bg-black/20 p-4">
+    <div className="border-l-2 border-white/10 pl-3">
       <p className="text-xs text-[color:var(--text-muted)]">
         {label}
       </p>
@@ -835,7 +835,7 @@ function DemoModules({
           {mockCheckResult.modules.legality.items.map((item) => (
             <article
               key={item.label}
-              className="rounded-2xl border border-white/8 bg-black/20 p-4"
+              className="border-t border-white/10 pt-3 first:border-t-0 first:pt-0"
             >
               <p className="font-medium text-[color:var(--text-primary)]">
                 {item.label}

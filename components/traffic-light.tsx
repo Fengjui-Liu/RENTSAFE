@@ -1,14 +1,14 @@
 import { type Status } from "@/data/mock-data";
 
 const lights = [
-  { status: "danger", on: "bg-[color:var(--danger)] shadow-[0_0_14px_rgba(239,68,68,0.9)]" },
-  { status: "warning", on: "bg-[color:var(--warning)] shadow-[0_0_14px_rgba(234,179,8,0.9)]" },
-  { status: "safe", on: "bg-[color:var(--success)] shadow-[0_0_14px_rgba(34,197,94,0.9)]" },
+  { status: "danger", on: "bg-[color:var(--danger)]" },
+  { status: "warning", on: "bg-[color:var(--warning)]" },
+  { status: "safe", on: "bg-[color:var(--success)]" },
 ] as const satisfies readonly { status: Status; on: string }[];
 
 const labels = {
   safe: "綠燈：安全",
-  warning: "黃燈：警示",
+  warning: "黃燈：需注意",
   danger: "紅燈：高風險",
 } satisfies Record<Status, string>;
 
