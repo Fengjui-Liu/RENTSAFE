@@ -26,7 +26,7 @@ npm run lint       # 送 PR 前執行
 npm run build      # 送 PR 前執行，確認能建置
 ```
 
-需要 Node.js 20 以上（Next.js 16 的需求；啟動失敗先用 `node -v` 確認版本）。
+需要 Node.js 22.13 以上（pdfjs-dist 6.x 的需求；啟動失敗先用 `node -v` 確認版本）。
 
 ## 技術棧
 

@@ -10,6 +10,8 @@ export type ContractRule = {
   test?: (match: RegExpMatchArray) => boolean;
   // 同一段落出現這些字就不算命中（例如雙方都可終止）
   exclude?: RegExp;
+  // 以「同一條」全文判斷是否不算命中；沒有條號時以該段落判斷（見 checkContractText 的 options.articleText）
+  articleExclude?: (articleText: string) => boolean;
   level: ContractRisk;
   basis: string;
   message: string;
@@ -32,7 +34,7 @@ export type ContractRulesResult = {
   source: DataSource;
 };
 
-export const MAX_CONTRACT_TEXT_LENGTH = 20000;
+export const MAX_CONTRACT_TEXT_LENGTH = 60000;
 
 const numeral = "[0-9一二兩三四五六七八九十]+";
 
@@ -68,6 +70,11 @@ function monthsAbove(limit: number) {
     return value !== undefined && parseNumeral(value) > limit;
   };
 }
+
+// R15：同一條內有列舉事由（「有下列情形之一」或「經…催告／定相當期限」），且沒有放寬字眼時，視為範本第十六條式的列舉終止事由，不觸發。
+// 已知限制：只看關鍵字。若列舉事由被惡意改寫（例如事由本身寫得很寬，但沒有用到放寬字眼），可能被放過。
+const enumeratedTerminationReasons = /有下列情形之一|經[^。；\n]{0,30}催告|定相當期限/;
+const looseningTerminationTerms = /隨時|任意|無須|無故|不須說明/;
 
 const invalidClauseMessage = "範本簽約注意事項二十二載明，此類條款如有簽訂者，該條款無效（範本明載無效）";
 
@@ -189,6 +196,8 @@ export const contractRules: readonly ContractRule[] = [
     label: "提前終止條款",
     pattern: /(出租人|房東|甲方)[^。；\n]{0,6}得[^。；\n]{0,20}終止/,
     exclude: /雙方|任一方|承租人亦得|乙方亦得/,
+    articleExclude: (articleText) =>
+      enumeratedTerminationReasons.test(articleText) && !looseningTerminationTerms.test(articleText),
     level: "medium",
     basis: "範本第十三條 p5；第十六條 p5–6",
     message:
@@ -220,12 +229,22 @@ function splitSegments(text: string) {
     .filter(Boolean);
 }
 
-export function checkContractText(text: string): ContractRulesResult {
+export type CheckContractTextOptions = {
+  // 該段文字所屬「同一條」的全文，供 articleExclude 判斷；未提供時以各段落本身判斷
+  articleText?: string;
+};
+
+export function checkContractText(text: string, options: CheckContractTextOptions = {}): ContractRulesResult {
   const clauses: RuleHit[] = [];
+  const articleText = options.articleText === undefined ? undefined : normalize(options.articleText);
 
   for (const segment of splitSegments(text)) {
     for (const rule of contractRules) {
       if (rule.exclude?.test(segment)) {
+        continue;
+      }
+
+      if (rule.articleExclude?.(articleText ?? segment)) {
         continue;
       }
 

@@ -19,9 +19,9 @@ type ContractDemoCaseBase = {
   description: string;
 };
 
-// pdf：只做假的 loading，顯示 mockContractResult；text：把示範文字帶入「貼上合約文字」，跑 F3 規則比對
+// mock：「載入示範合約」，顯示 mockContractResult（示範資料，不解析任何檔案）；text：把示範文字帶入「貼上合約文字」，跑 F3 規則比對
 export type ContractDemoCase =
-  | (ContractDemoCaseBase & { kind: "pdf"; fileName: string })
+  | (ContractDemoCaseBase & { kind: "mock"; fileName: string })
   | (ContractDemoCaseBase & { kind: "text"; text: string });
 
 export const checkDemoCases: readonly CheckDemoCase[] = [
@@ -48,9 +48,9 @@ export const checkDemoCases: readonly CheckDemoCase[] = [
 export const contractDemoCases: readonly ContractDemoCase[] = [
   {
     id: "sample-pdf",
-    title: "示範租約 PDF",
-    description: "押金三個月、禁止遷戶籍等 5 條示範條款",
-    kind: "pdf",
+    title: "載入示範合約（示範資料）",
+    description: "預設的示範審查結果，不解析檔案：押金三個月、禁止遷戶籍等 5 條",
+    kind: "mock",
     fileName: mockContractResult.fileName,
   },
   ...contractSamples.map((sample) => ({

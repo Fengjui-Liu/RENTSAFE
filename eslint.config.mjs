@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // pdfjs-dist 的第三方檔案（由 scripts/copy-pdfjs-assets.mjs 複製）
+    "public/pdfjs/**",
   ]),
 ]);
 

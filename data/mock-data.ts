@@ -16,11 +16,19 @@ export const propertyLoadingSteps = [
   "產生查核報告...",
 ] as const;
 
-// PDF 示範流程：只載入預設結果
+// 「載入示範合約」：只載入預設結果（示範資料）
 export const contractDemoLoadingSteps = [
   "載入示範合約...",
   "整理條款風險...",
   "產生審查報告...",
+] as const;
+
+// 上傳 PDF（F3）：瀏覽器端取字後依範本規則比對；步驟依實際進度推進，不用計時器
+export const contractPdfSteps = [
+  "讀取 PDF 文字層",
+  "整理文字（合併斷行、移除空白）",
+  "比對住宅租賃契約書範本",
+  "產生條款審查報告",
 ] as const;
 
 // 貼上合約文字（F3）：實際依範本規則比對
