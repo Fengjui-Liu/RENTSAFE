@@ -3,39 +3,46 @@ type DemoCasePickerProps = {
   selectedId: string | null;
   onLoad: (id: string) => void;
   onReset: () => void;
-  compact?: boolean;
 };
 
-export function DemoCasePicker({ cases, selectedId, onLoad, onReset, compact = false }: DemoCasePickerProps) {
+// 展示模式工具列：/check 與 /contract 共用。案例說明改放在 title（hover 提示），按鈕維持單行
+const chipBase =
+  "whitespace-nowrap rounded-full border px-4 py-2 text-[15px] leading-6 transition";
+
+export function DemoCasePicker({ cases, selectedId, onLoad, onReset }: DemoCasePickerProps) {
   return (
-    <section className={compact ? "rounded-3xl border border-white/10 bg-white/[0.03] p-5" : "panel p-6 sm:p-8"}>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="eyebrow">展示模式</p>
-          <p className="mt-2 text-sm text-[color:var(--text-secondary)]">預設案例・離線可用</p>
-        </div>
-        <button type="button" className="button-secondary" onClick={onReset}>
-          重置
-        </button>
-      </div>
-      <div className="grid gap-3 sm:grid-cols-2">
-        {cases.map((demoCase) => (
+    <section
+      aria-label="展示模式"
+      className="flex flex-wrap items-center gap-2 rounded-3xl border border-white/10 bg-white/[0.03] px-4 py-3"
+    >
+      <p className="eyebrow mr-2 whitespace-nowrap">展示模式</p>
+      <p className="mr-2 whitespace-nowrap text-[15px] text-[color:var(--text-secondary)]">預設案例・離線可用</p>
+      {cases.map((demoCase) => {
+        const selected = selectedId === demoCase.id;
+        return (
           <button
             key={demoCase.id}
             type="button"
-            aria-pressed={selectedId === demoCase.id}
+            title={demoCase.description}
+            aria-pressed={selected}
             onClick={() => onLoad(demoCase.id)}
-            className={`rounded-3xl border p-4 text-left transition ${
-              selectedId === demoCase.id
-                ? "border-[color:var(--primary)]/50 bg-[color:var(--primary)]/8"
-                : "border-white/10 bg-white/[0.03] hover:border-[color:var(--primary)]/30"
+            className={`${chipBase} ${
+              selected
+                ? "border-[color:var(--primary)]/50 bg-[color:var(--primary)]/8 text-[color:var(--text-primary)]"
+                : "border-white/10 bg-white/[0.03] text-[color:var(--text-secondary)] hover:border-[color:var(--primary)]/30 hover:text-[color:var(--text-primary)]"
             }`}
           >
-            <p className="font-medium text-[color:var(--text-primary)]">{demoCase.title}</p>
-            <p className="mt-1 text-sm leading-6 text-[color:var(--text-secondary)]">{demoCase.description}</p>
+            {demoCase.title}
           </button>
-        ))}
-      </div>
+        );
+      })}
+      <button
+        type="button"
+        onClick={onReset}
+        className={`${chipBase} border-white/12 text-[color:var(--text-secondary)] hover:border-[color:var(--primary)]/30 hover:text-[color:var(--text-primary)]`}
+      >
+        重置
+      </button>
     </section>
   );
 }

@@ -590,7 +590,6 @@ export function CheckDemo({
           selectedId={selectedCaseId}
           onLoad={loadCase}
           onReset={reset}
-          compact
         />
       </div>
 

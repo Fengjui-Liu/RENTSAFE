@@ -145,7 +145,6 @@ export function ListingImageUpload({
 }) {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
-  const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [recognizedInfo, setRecognizedInfo] =
@@ -182,7 +181,6 @@ export function ListingImageUpload({
 
     setFile(selected);
     setImageUrl(URL.createObjectURL(selected));
-    setText("");
     setRecognizedInfo(null);
   }
 
@@ -191,7 +189,6 @@ export function ListingImageUpload({
 
     setLoading(true);
     setError("");
-    setText("");
     setRecognizedInfo(null);
 
     let worker:
@@ -202,11 +199,7 @@ export function ListingImageUpload({
       worker = await createWorker("chi_tra+eng");
 
       const result = await worker.recognize(file);
-      const recognizedText = result.data.text;
-
-      setText(recognizedText);
-
-      const listingInfo = parseListingText(recognizedText);
+      const listingInfo = parseListingText(result.data.text);
 
       setRecognizedInfo(listingInfo);
       onRecognized?.(listingInfo);
@@ -311,18 +304,6 @@ export function ListingImageUpload({
             辨識可能有誤，請核對
           </p>
         </div>
-      )}
-
-      {text && (
-        <details>
-          <summary className="cursor-pointer text-sm font-semibold text-gray-300">
-            查看完整 OCR 辨識文字
-          </summary>
-
-          <pre className="mt-3 max-h-80 overflow-auto whitespace-pre-wrap border-l-2 border-white/15 pl-4 text-sm text-gray-200">
-            {text}
-          </pre>
-        </details>
       )}
     </section>
   );

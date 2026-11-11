@@ -272,9 +272,10 @@ export function ContractDemo({ initialCaseId }: { initialCaseId?: string }) {
   const clauses: DisplayClause[] = rulesView ? rulesView.result.clauses : mockContractResult.clauses;
 
   return (
-    <>
-      <DemoCasePicker cases={contractDemoCases} selectedId={selectedCaseId} onLoad={loadCase} onReset={resetDemo} />
-      <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+    <div className="grid gap-8 lg:grid-cols-[5fr_7fr] lg:items-start">
+      {/* 左欄：展示工具列＋上傳區＋貼上文字 */}
+      <div className="min-w-0 space-y-4">
+        <DemoCasePicker cases={contractDemoCases} selectedId={selectedCaseId} onLoad={loadCase} onReset={resetDemo} />
         <section className="panel p-6 sm:p-8">
           <div className="mb-6 space-y-3">
             <p className="eyebrow">合約輸入</p>
@@ -304,7 +305,7 @@ export function ContractDemo({ initialCaseId }: { initialCaseId?: string }) {
               PDF
             </span>
             <span className="text-lg font-semibold text-[color:var(--text-primary)]">拖曳或點擊選擇合約 PDF</span>
-            <span className="mt-3 flex flex-wrap justify-center gap-2 text-xs text-[color:var(--text-secondary)]">
+            <span className="mt-3 flex flex-wrap justify-center gap-2 text-[15px] text-[color:var(--text-secondary)]">
               <span className="rounded-full border border-white/10 bg-black/30 px-3 py-1">瀏覽器內解析，不上傳</span>
               <span className="rounded-full border border-white/10 bg-black/30 px-3 py-1">需有文字層</span>
             </span>
@@ -321,35 +322,35 @@ export function ContractDemo({ initialCaseId }: { initialCaseId?: string }) {
           </label>
 
           {pdfName && (
-            <div className="mt-5 rounded-3xl border border-white/10 bg-white/[0.03] p-4 text-sm text-[color:var(--text-secondary)]">
+            <div className="mt-5 rounded-3xl border border-white/10 bg-white/[0.03] p-4 text-[15px] text-[color:var(--text-secondary)]">
               已選擇檔案：<span className="break-all text-[color:var(--text-primary)]">{pdfName}</span>
             </div>
           )}
           {pdfError && (
-            <p role="alert" className="mt-3 rounded-2xl border border-amber-500/20 bg-amber-500/8 px-4 py-3 text-sm text-amber-200">
+            <p role="alert" className="mt-3 rounded-2xl border border-amber-500/20 bg-amber-500/8 px-4 py-3 text-[15px] text-amber-200">
               {pdfError}
             </p>
           )}
 
-          <p className="mt-4 text-xs leading-6 text-[color:var(--text-muted)]">{RULES_DISCLAIMER}</p>
+          <p className="mt-4 text-[15px] leading-6 text-[color:var(--text-muted)]">{RULES_DISCLAIMER}</p>
 
           <div className="mt-6 flex items-center gap-4">
             <div className="h-px flex-1 bg-white/10" />
-            <span className="text-xs text-[color:var(--text-muted)]">或</span>
+            <span className="text-[15px] text-[color:var(--text-muted)]">或</span>
             <div className="h-px flex-1 bg-white/10" />
           </div>
 
           <label className="mt-6 block space-y-2">
-            <span className="text-sm text-[color:var(--text-secondary)]">貼上合約文字</span>
+            <span className="text-[15px] text-[color:var(--text-secondary)]">貼上合約文字</span>
             <textarea
               value={contractText}
               onChange={(event) => setContractText(event.target.value)}
               rows={8}
               placeholder="例如：承租人應繳納三個月押金…"
-              className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-sm leading-7 text-[color:var(--text-primary)] outline-none transition placeholder:text-[color:var(--text-muted)] focus:border-[color:var(--primary)]/40"
+              className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-[15px] leading-7 text-[color:var(--text-primary)] outline-none transition placeholder:text-[color:var(--text-muted)] focus:border-[color:var(--primary)]/40"
             />
           </label>
-          {textError && <p className="mt-2 text-sm text-amber-300">{textError}</p>}
+          {textError && <p className="mt-2 text-[15px] text-amber-300">{textError}</p>}
 
           <button
             type="button"
@@ -374,162 +375,163 @@ export function ContractDemo({ initialCaseId }: { initialCaseId?: string }) {
             </button>
           </div>
         </section>
+      </div>
 
-        <section className="panel p-6 sm:p-8">
-          {phase === "idle" && (
-            <div className="flex h-full min-h-96 flex-col justify-between">
-              <h3 className="font-serif text-3xl text-[color:var(--text-primary)]">結果預覽</h3>
+      {/* 右欄：結果預覽／審查結果 */}
+      <section className="panel min-w-0 p-6 sm:p-8">
+        {phase === "idle" && (
+          <div className="flex h-full min-h-96 flex-col justify-between">
+            <h3 className="font-serif text-3xl text-[color:var(--text-primary)]">結果預覽</h3>
 
-              <div className="space-y-3">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-sm text-[color:var(--text-secondary)]">示範合約的條款數</p>
-                  <SourceTag source="mock" />
+            <div className="space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm text-[color:var(--text-secondary)]">示範合約的條款數</p>
+                <SourceTag source="mock" />
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="rounded-3xl border border-red-500/15 bg-red-500/8 p-5">
+                  <p className="text-sm text-red-200">高風險</p>
+                  <p className="mt-2 text-3xl font-semibold text-[color:var(--text-primary)]">{highRiskCount} 條</p>
                 </div>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="rounded-3xl border border-red-500/15 bg-red-500/8 p-5">
-                    <p className="text-sm text-red-200">高風險</p>
-                    <p className="mt-2 text-3xl font-semibold text-[color:var(--text-primary)]">{highRiskCount} 條</p>
-                  </div>
-                  <div className="rounded-3xl border border-amber-500/15 bg-amber-500/8 p-5">
-                    <p className="text-sm text-amber-200">需注意</p>
-                    <p className="mt-2 text-3xl font-semibold text-[color:var(--text-primary)]">{mediumRiskCount} 條</p>
-                  </div>
+                <div className="rounded-3xl border border-amber-500/15 bg-amber-500/8 p-5">
+                  <p className="text-sm text-amber-200">需注意</p>
+                  <p className="mt-2 text-3xl font-semibold text-[color:var(--text-primary)]">{mediumRiskCount} 條</p>
                 </div>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {phase === "loading" && loading && (
-            <div className="space-y-6">
-              <p className="eyebrow">審查中</p>
-              {loading.kind === "pdf" ? (
-                <PdfSteps loading={loading} />
-              ) : (
-                <AnalysisSteps steps={loading.kind === "text" ? contractLoadingSteps : contractDemoLoadingSteps} />
-              )}
-            </div>
-          )}
+        {phase === "loading" && loading && (
+          <div className="space-y-6">
+            <p className="eyebrow">審查中</p>
+            {loading.kind === "pdf" ? (
+              <PdfSteps loading={loading} />
+            ) : (
+              <AnalysisSteps steps={loading.kind === "text" ? contractLoadingSteps : contractDemoLoadingSteps} />
+            )}
+          </div>
+        )}
 
-          {phase === "done" && view && (
-            <div className="space-y-6">
-              <div className="flex flex-wrap items-start justify-between gap-4">
-                <div className="min-w-0">
-                  <p className="eyebrow">條款風險報告</p>
-                  <h3 className="mt-3 break-all font-serif text-2xl text-[color:var(--text-primary)]">
-                    {rulesView ? rulesView.title : mockContractResult.fileName}
-                  </h3>
-                  {rulesView ? (
-                    <p className="mt-2 text-sm text-[color:var(--text-secondary)]">
-                      {rulesView.numPages !== undefined && `${rulesView.numPages} 頁・`}
-                      取出 {rulesView.rawText.length.toLocaleString()} 字・命中 {rulesView.result.clauses.length} 條規則
-                    </p>
-                  ) : (
-                    <p className="mt-2 text-sm text-[color:var(--text-secondary)]">示範結果：顯示預設的審查內容，未解析任何檔案</p>
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  <SourceTag source={rulesView ? rulesView.result.source : mockContractResult.source} />
-                  {rulesView ? (
-                    rulesView.result.riskLevel && <StatusBadge kind="risk" value={rulesView.result.riskLevel} />
-                  ) : (
-                    <StatusBadge kind="risk" value={mockContractResult.riskLevel} />
-                  )}
-                </div>
-              </div>
-
-              {rulesView && (
-                <div className="space-y-3">
-                  <p className="rounded-3xl border border-white/10 bg-white/[0.03] p-4 text-sm leading-7 text-[color:var(--text-secondary)]">
-                    {RULES_DISCLAIMER}。請對照下方「{rulesView.input === "pdf" ? "取出的文字" : "整理後的文字"}」確認有沒有讀錯。
+        {phase === "done" && view && (
+          <div className="space-y-6">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div className="min-w-0">
+                <p className="eyebrow">條款風險報告</p>
+                <h3 className="mt-3 break-all font-serif text-2xl text-[color:var(--text-primary)]">
+                  {rulesView ? rulesView.title : mockContractResult.fileName}
+                </h3>
+                {rulesView ? (
+                  <p className="mt-2 text-sm text-[color:var(--text-secondary)]">
+                    {rulesView.numPages !== undefined && `${rulesView.numPages} 頁・`}
+                    取出 {rulesView.rawText.length.toLocaleString()} 字・命中 {rulesView.result.clauses.length} 條規則
                   </p>
-                  {rulesView.result.normalized.excludedNotes && (
-                    <p className="rounded-3xl border border-white/10 bg-white/[0.03] p-4 text-sm leading-7 text-[color:var(--text-secondary)]">
-                      已排除簽約注意事項段落
-                    </p>
-                  )}
-                  {rulesView.emptyPages && rulesView.emptyPages.length > 0 && (
-                    <p className="rounded-3xl border border-amber-500/15 bg-amber-500/8 p-4 text-sm leading-7 text-amber-100">
-                      第 {rulesView.emptyPages.join("、")} 頁沒有取到文字（可能是掃描頁），這些頁面未納入比對，請改貼上該頁文字。
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {rulesView && rulesView.result.clauses.length === 0 && (
-                <div className="rounded-3xl border border-amber-500/15 bg-amber-500/8 p-5 text-sm leading-7 text-amber-100">
-                  <p className="font-semibold">未命中規則（不代表沒問題）</p>
-                  <p className="mt-1">{RULES_DISCLAIMER}</p>
-                </div>
-              )}
-
-              <div className="space-y-4">
-                {clauses.map((clause, index) => (
-                  <article key={`${clause.label}-${index}`} className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
-                    <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                      <h4 className="text-lg font-semibold text-[color:var(--text-primary)]">
-                        {clause.label}
-                        {clause.article && (
-                          <span className="ml-2 text-sm font-normal text-[color:var(--text-muted)]">{clause.article}</span>
-                        )}
-                      </h4>
-                      <StatusBadge kind="risk" value={clause.risk} />
-                    </div>
-                    <dl className="space-y-3 text-sm leading-7 text-[color:var(--text-secondary)]">
-                      <div>
-                        <dt className="text-[color:var(--text-muted)]">原始條文</dt>
-                        <dd className="break-words text-[color:var(--text-primary)]">{clause.original}</dd>
-                      </div>
-                      <div>
-                        <dt className="text-[color:var(--text-muted)]">風險說明</dt>
-                        <dd>{clause.issue}</dd>
-                      </div>
-                      <div>
-                        <dt className="text-[color:var(--text-muted)]">建議作法</dt>
-                        <dd>{clause.suggestion}</dd>
-                      </div>
-                      <div>
-                        <dt className="text-[color:var(--text-muted)]">範本依據</dt>
-                        <dd>{clause.basis}</dd>
-                        <dd className="text-xs leading-6 text-[color:var(--text-muted)]">{BASIS_PAGE_NOTE}</dd>
-                      </div>
-                    </dl>
-                  </article>
-                ))}
+                ) : (
+                  <p className="mt-2 text-sm text-[color:var(--text-secondary)]">示範結果：顯示預設的審查內容，未解析任何檔案</p>
+                )}
               </div>
+              <div className="flex items-center gap-2">
+                <SourceTag source={rulesView ? rulesView.result.source : mockContractResult.source} />
+                {rulesView ? (
+                  rulesView.result.riskLevel && <StatusBadge kind="risk" value={rulesView.result.riskLevel} />
+                ) : (
+                  <StatusBadge kind="risk" value={mockContractResult.riskLevel} />
+                )}
+              </div>
+            </div>
 
-              {rulesView && (
-                <div className="space-y-3 rounded-3xl border border-white/10 bg-white/[0.03] p-5 text-sm text-[color:var(--text-secondary)]">
-                  <h4 className="text-lg font-semibold text-[color:var(--text-primary)]">
-                    {rulesView.input === "pdf" ? "取出的文字" : "整理後的文字"}
-                  </h4>
+            {rulesView && (
+              <div className="space-y-3">
+                <p className="rounded-3xl border border-white/10 bg-white/[0.03] p-4 text-sm leading-7 text-[color:var(--text-secondary)]">
+                  {RULES_DISCLAIMER}。請對照下方「{rulesView.input === "pdf" ? "取出的文字" : "整理後的文字"}」確認有沒有讀錯。
+                </p>
+                {rulesView.result.normalized.excludedNotes && (
+                  <p className="rounded-3xl border border-white/10 bg-white/[0.03] p-4 text-sm leading-7 text-[color:var(--text-secondary)]">
+                    已排除簽約注意事項段落
+                  </p>
+                )}
+                {rulesView.emptyPages && rulesView.emptyPages.length > 0 && (
+                  <p className="rounded-3xl border border-amber-500/15 bg-amber-500/8 p-4 text-sm leading-7 text-amber-100">
+                    第 {rulesView.emptyPages.join("、")} 頁沒有取到文字（可能是掃描頁），這些頁面未納入比對，請改貼上該頁文字。
+                  </p>
+                )}
+              </div>
+            )}
+
+            {rulesView && rulesView.result.clauses.length === 0 && (
+              <div className="rounded-3xl border border-amber-500/15 bg-amber-500/8 p-5 text-sm leading-7 text-amber-100">
+                <p className="font-semibold">未命中規則（不代表沒問題）</p>
+                <p className="mt-1">{RULES_DISCLAIMER}</p>
+              </div>
+            )}
+
+            <div className="space-y-4">
+              {clauses.map((clause, index) => (
+                <article key={`${clause.label}-${index}`} className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
+                  <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                    <h4 className="text-lg font-semibold text-[color:var(--text-primary)]">
+                      {clause.label}
+                      {clause.article && (
+                        <span className="ml-2 text-sm font-normal text-[color:var(--text-muted)]">{clause.article}</span>
+                      )}
+                    </h4>
+                    <StatusBadge kind="risk" value={clause.risk} />
+                  </div>
+                  <dl className="space-y-3 text-sm leading-7 text-[color:var(--text-secondary)]">
+                    <div>
+                      <dt className="text-[color:var(--text-muted)]">原始條文</dt>
+                      <dd className="break-words text-[color:var(--text-primary)]">{clause.original}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-[color:var(--text-muted)]">風險說明</dt>
+                      <dd>{clause.issue}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-[color:var(--text-muted)]">建議作法</dt>
+                      <dd>{clause.suggestion}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-[color:var(--text-muted)]">範本依據</dt>
+                      <dd>{clause.basis}</dd>
+                      <dd className="text-xs leading-6 text-[color:var(--text-muted)]">{BASIS_PAGE_NOTE}</dd>
+                    </div>
+                  </dl>
+                </article>
+              ))}
+            </div>
+
+            {rulesView && (
+              <div className="space-y-3 rounded-3xl border border-white/10 bg-white/[0.03] p-5 text-sm text-[color:var(--text-secondary)]">
+                <h4 className="text-lg font-semibold text-[color:var(--text-primary)]">
+                  {rulesView.input === "pdf" ? "取出的文字" : "整理後的文字"}
+                </h4>
+                <details>
+                  <summary className="cursor-pointer text-[color:var(--text-primary)]">
+                    已比對的文字（{rulesView.result.normalized.lines.length} 行，已合併斷行並移除中文字間空白）
+                  </summary>
+                  <TextLines lines={rulesView.result.normalized.lines} />
+                </details>
+                {rulesView.result.normalized.excludedNotes && (
                   <details>
                     <summary className="cursor-pointer text-[color:var(--text-primary)]">
-                      已比對的文字（{rulesView.result.normalized.lines.length} 行，已合併斷行並移除中文字間空白）
+                      已排除：簽約注意事項段落（{rulesView.result.normalized.excludedLines.length} 行，未送規則比對）
                     </summary>
-                    <TextLines lines={rulesView.result.normalized.lines} />
+                    <TextLines lines={rulesView.result.normalized.excludedLines} />
                   </details>
-                  {rulesView.result.normalized.excludedNotes && (
-                    <details>
-                      <summary className="cursor-pointer text-[color:var(--text-primary)]">
-                        已排除：簽約注意事項段落（{rulesView.result.normalized.excludedLines.length} 行，未送規則比對）
-                      </summary>
-                      <TextLines lines={rulesView.result.normalized.excludedLines} />
-                    </details>
-                  )}
-                  {rulesView.input === "pdf" && (
-                    <details>
-                      <summary className="cursor-pointer text-[color:var(--text-primary)]">原始取出的文字（未整理）</summary>
-                      <pre className="mt-3 max-h-96 overflow-y-auto whitespace-pre-wrap break-words rounded-2xl border border-white/10 bg-black/30 p-4 text-xs leading-6">
-                        {rulesView.rawText}
-                      </pre>
-                    </details>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-        </section>
-      </div>
-    </>
+                )}
+                {rulesView.input === "pdf" && (
+                  <details>
+                    <summary className="cursor-pointer text-[color:var(--text-primary)]">原始取出的文字（未整理）</summary>
+                    <pre className="mt-3 max-h-96 overflow-y-auto whitespace-pre-wrap break-words rounded-2xl border border-white/10 bg-black/30 p-4 text-xs leading-6">
+                      {rulesView.rawText}
+                    </pre>
+                  </details>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </section>
+    </div>
   );
 }
