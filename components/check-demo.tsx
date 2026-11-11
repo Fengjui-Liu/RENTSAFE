@@ -82,7 +82,7 @@ function OverallReport({
   }
 
   return (
-    <section className="space-y-5 rounded-3xl border border-orange-500/20 bg-orange-500/5 p-5">
+    <section className="space-y-5 rounded-3xl border border-white/10 bg-white/[0.03] p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <h3 className="text-2xl font-semibold text-[color:var(--text-primary)]">
           查核結果
@@ -458,7 +458,7 @@ export function CheckDemo({
       <div className="space-y-6">
         <section className="panel p-6 sm:p-8">
           <div className="mb-6">
-            <h2 className="font-serif text-3xl text-[color:var(--text-primary)]">
+            <h2 className="text-2xl font-semibold text-[color:var(--text-primary)]">
               物件條件
             </h2>
           </div>
@@ -606,7 +606,7 @@ export function CheckDemo({
                   : "綜合物件查核"}
               </p>
 
-              <h3 className="mt-3 font-serif text-2xl text-[color:var(--text-primary)]">
+              <h3 className="mt-3 text-xl font-semibold text-[color:var(--text-primary)]">
                 臺北市{result.district}・{result.rentalType}
               </h3>
 
@@ -680,7 +680,7 @@ function SelectField({
 function EmptyResult() {
   return (
     <div className="flex min-h-96 flex-col justify-between gap-8">
-      <h3 className="font-serif text-3xl text-[color:var(--text-primary)]">
+      <h3 className="text-2xl font-semibold text-[color:var(--text-primary)]">
         結果預覽
       </h3>
     </div>

@@ -279,7 +279,7 @@ export function ContractDemo({ initialCaseId }: { initialCaseId?: string }) {
         <section className="panel p-6 sm:p-8">
           <div className="mb-6 space-y-3">
             <p className="eyebrow">合約輸入</p>
-            <h2 className="font-serif text-3xl text-[color:var(--text-primary)]">上傳租賃契約 PDF</h2>
+            <h2 className="text-2xl font-semibold text-[color:var(--text-primary)]">上傳租賃契約 PDF</h2>
           </div>
 
           <label
@@ -301,7 +301,7 @@ export function ContractDemo({ initialCaseId }: { initialCaseId?: string }) {
               onFile(event.dataTransfer.files?.[0]);
             }}
           >
-            <span className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-[color:var(--primary)]/12 text-3xl text-[color:var(--primary)]">
+            <span className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-white/5 text-lg font-semibold text-[color:var(--text-secondary)]">
               PDF
             </span>
             <span className="text-lg font-semibold text-[color:var(--text-primary)]">拖曳或點擊選擇合約 PDF</span>
@@ -381,7 +381,7 @@ export function ContractDemo({ initialCaseId }: { initialCaseId?: string }) {
       <section className="panel min-w-0 p-6 sm:p-8">
         {phase === "idle" && (
           <div className="flex h-full min-h-96 flex-col justify-between">
-            <h3 className="font-serif text-3xl text-[color:var(--text-primary)]">結果預覽</h3>
+            <h3 className="text-2xl font-semibold text-[color:var(--text-primary)]">結果預覽</h3>
 
             <div className="space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
@@ -418,7 +418,7 @@ export function ContractDemo({ initialCaseId }: { initialCaseId?: string }) {
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div className="min-w-0">
                 <p className="eyebrow">條款風險報告</p>
-                <h3 className="mt-3 break-all font-serif text-2xl text-[color:var(--text-primary)]">
+                <h3 className="mt-3 break-all text-xl font-semibold text-[color:var(--text-primary)]">
                   {rulesView ? rulesView.title : mockContractResult.fileName}
                 </h3>
                 {rulesView ? (

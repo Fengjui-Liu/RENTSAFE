@@ -5,7 +5,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "RentSafe 賃居守護",
-  description: "AI 租屋風險查核工具",
+  description: "租屋風險查核工具",
 };
 
 export default function RootLayout({

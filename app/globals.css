@@ -93,7 +93,7 @@ body {
 .eyebrow {
   font-size: 0.9375rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--text-secondary);
 }
 
 .title-accent {

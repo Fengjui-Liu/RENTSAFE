@@ -14,7 +14,7 @@ export default async function ContractPage({ searchParams }: PageProps<"/contrac
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
       <section className="space-y-4">
-        <h1 className="font-serif text-5xl leading-tight text-[color:var(--text-primary)]">合約審查</h1>
+        <h1 className="text-4xl font-semibold leading-tight text-[color:var(--text-primary)]">合約審查</h1>
         <p className="max-w-3xl text-base leading-8 text-[color:var(--text-secondary)]">
           依內政部住宅租賃契約書範本規則比對
         </p>

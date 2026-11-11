@@ -105,16 +105,11 @@ export default function Home() {
         <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div className="space-y-8 animate-enter">
             <div className="space-y-4">
-              <div className="inline-flex items-center gap-3 rounded-full border border-[color:var(--primary)]/30 px-4 py-2 text-sm font-semibold text-[color:var(--primary-soft)]">
-                <span className="inline-flex h-2 w-2 rounded-full bg-[color:var(--primary)]" />
-                AI 租屋風險查核
-              </div>
-              <h1 className="max-w-3xl font-serif text-5xl leading-tight text-[color:var(--text-primary)] sm:text-6xl">
-                60 秒，
-                <span className="title-accent">看清你要租的房子</span>
+              <h1 className="text-4xl font-semibold leading-tight text-[color:var(--text-primary)]">
+                簽約前，查核房子與合約
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-[color:var(--text-secondary)]">
-                整合內政部實價登錄與住宅租賃契約書範本，讓每個學生都能像專業人士一樣看房
+                租金對照實價登錄，合約對照內政部範本。
               </p>
             </div>
 
@@ -127,11 +122,7 @@ export default function Home() {
               </Link>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-3">
-              <div className="metric-card">
-                <p className="text-sm text-[color:var(--text-secondary)]">完成時間</p>
-                <p className="mt-2 text-3xl font-semibold text-[color:var(--text-primary)]">60 秒內</p>
-              </div>
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="metric-card">
                 <p className="text-sm text-[color:var(--text-secondary)]">查核模組</p>
                 <p className="mt-2 text-3xl font-semibold text-[color:var(--text-primary)]">3 大面向</p>
@@ -193,16 +184,13 @@ export default function Home() {
       <section className="space-y-6">
         <div>
           <p className="eyebrow">核心功能</p>
-          <h2 className="font-serif text-4xl text-[color:var(--text-primary)]">把租屋風險拆成可判斷的訊號</h2>
+          <h2 className="mt-2 text-2xl font-semibold text-[color:var(--text-primary)]">把租屋風險拆成可判斷的訊號</h2>
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {featureCards.map((card, index) => (
+          {featureCards.map((card) => (
             <Link key={card.title} href={card.href} className="feature-card group block p-6">
-              <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[color:var(--primary)]/12 text-lg font-semibold text-[color:var(--primary)]">
-                0{index + 1}
-              </div>
-              <h3 className="font-serif text-2xl text-[color:var(--text-primary)]">{card.title}</h3>
+              <h3 className="text-xl font-semibold text-[color:var(--text-primary)]">{card.title}</h3>
               <p className="mt-3 text-sm leading-7 text-[color:var(--text-secondary)]">{card.description}</p>
             </Link>
           ))}

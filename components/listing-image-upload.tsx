@@ -218,7 +218,7 @@ export function ListingImageUpload({
   return (
     <section className="space-y-5 rounded-3xl border border-white/10 bg-[#202020] p-6">
       <div>
-        <p className="text-sm font-semibold text-orange-500">
+        <p className="text-sm font-semibold text-gray-400">
           AI 租屋截圖辨識
         </p>
 

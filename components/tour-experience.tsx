@@ -113,7 +113,7 @@ export function TourExperience() {
               情境示範
             </span>
           </div>
-          <h2 className="mt-3 font-serif text-3xl text-[color:var(--text-primary)]">{tourHouse.title}</h2>
+          <h2 className="mt-3 text-2xl font-semibold text-[color:var(--text-primary)]">{tourHouse.title}</h2>
           <p className="mt-2 text-sm text-[color:var(--text-secondary)]">{tourHouse.description}</p>
         </div>
         <p className="rounded-full border border-[color:var(--primary)]/30 bg-[color:var(--primary)]/8 px-4 py-2 text-sm text-[color:var(--text-primary)]">
