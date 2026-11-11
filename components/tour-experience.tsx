@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { useState } from "react";
-import type { CSSProperties } from "react";
+import { Component, useState, useSyncExternalStore } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { tourHotspotCount, tourHouse, tourScenes, type TourScene } from "@/data/tour-data";
 
 const TourViewingScene = dynamic(() => import("@/components/tour-viewing-scene"), {
@@ -21,16 +21,55 @@ const TourSigningScene = dynamic(() => import("@/components/tour-signing-scene")
   loading: () => <div className="h-full w-full animate-pulse bg-[#d7ad7d]" aria-hidden="true" />,
 });
 
-function SceneIllustration({ sceneId }: { sceneId: TourScene["id"] }) {
+let webglSupportCache: boolean | null = null;
+
+function detectWebGL() {
+  if (webglSupportCache !== null) return webglSupportCache;
+  try {
+    const canvas = document.createElement("canvas");
+    const gl = canvas.getContext("webgl2") ?? canvas.getContext("webgl");
+    webglSupportCache = gl !== null;
+    // 釋放偵測用的 context，避免佔用瀏覽器的 WebGL context 配額
+    gl?.getExtension("WEBGL_lose_context")?.loseContext();
+  } catch {
+    webglSupportCache = false;
+  }
+  return webglSupportCache;
+}
+
+const noopSubscribe = () => () => {};
+
+function useWebGLSupport() {
+  // 伺服器端與 hydration 前先假設支援，載入後在瀏覽器實際偵測
+  return useSyncExternalStore(noopSubscribe, detectWebGL, () => true);
+}
+
+class SceneErrorBoundary extends Component<{ onError: () => void; children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  componentDidCatch() {
+    this.props.onError();
+  }
+
+  render() {
+    return this.state.failed ? null : this.props.children;
+  }
+}
+
+function SceneIllustration({ sceneId, onContextLost }: { sceneId: TourScene["id"]; onContextLost: () => void }) {
   if (sceneId === "viewing") {
-    return <TourViewingScene />;
+    return <TourViewingScene onContextLost={onContextLost} />;
   }
 
   if (sceneId === "landlord") {
-    return <TourLandlordScene />;
+    return <TourLandlordScene onContextLost={onContextLost} />;
   }
 
-  return <TourSigningScene />;
+  return <TourSigningScene onContextLost={onContextLost} />;
 }
 
 export function TourExperience() {
@@ -38,6 +77,10 @@ export function TourExperience() {
   const [activeHotspotId, setActiveHotspotId] = useState<string | null>(null);
   const [visitedIds, setVisitedIds] = useState<string[]>([]);
   const [showSummary, setShowSummary] = useState(false);
+  const [webglFailed, setWebglFailed] = useState(false);
+  const webglSupported = useWebGLSupport();
+  const listMode = !webglSupported || webglFailed;
+  const switchToListMode = () => setWebglFailed(true);
 
   const scene = tourScenes[sceneIndex];
   const activeHotspot = scene.hotspots.find((hotspot) => hotspot.id === activeHotspotId) ?? null;
@@ -137,77 +180,133 @@ export function TourExperience() {
         <div className="space-y-4">
           <div>
             <p className="mb-3 text-sm text-[color:var(--text-secondary)]">{scene.description}</p>
-            <div className="tour-3d-frame relative aspect-[4/3] w-full overflow-hidden sm:aspect-video">
-              <SceneIllustration sceneId={scene.id} />
-              {scene.hotspots.map((hotspot, index) => {
-                const visited = visitedIds.includes(hotspot.id);
-                const active = hotspot.id === activeHotspotId;
+            {listMode ? (
+              <div>
+                <p className="mb-3 text-xs text-[color:var(--text-muted)]">此裝置無法顯示 3D，已切換為清單模式</p>
+                <ul className="space-y-3">
+                  {scene.hotspots.map((hotspot, index) => {
+                    const visited = visitedIds.includes(hotspot.id);
+                    const active = hotspot.id === activeHotspotId;
 
-                return (
-                  <button
-                    key={hotspot.id}
-                    type="button"
-                    aria-label={hotspot.label}
-                    aria-pressed={active}
-                    aria-controls={active ? "tour-hotspot-dialog" : undefined}
-                    onClick={() => openHotspot(hotspot.id)}
-                    style={{ left: `${hotspot.x}%`, top: `${hotspot.y}%` }}
-                    className={`absolute z-10 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition sm:text-sm ${
-                      active
-                        ? "border-[color:var(--primary)] bg-[color:var(--primary)] text-white"
-                        : visited
-                          ? "border-[color:var(--primary)]/40 bg-black/70 text-[color:var(--primary-soft)]"
-                          : "border-white/20 bg-black/70 text-[color:var(--text-primary)]"
-                    }`}
-                  >
-                    <span>{visited ? "✓" : index + 1}</span>
-                    <span>{hotspot.label}</span>
-                  </button>
-                );
-              })}
+                    return (
+                      <li
+                        key={hotspot.id}
+                        className={`rounded-2xl border transition ${
+                          active
+                            ? "border-[color:var(--primary)]/50 bg-[color:var(--primary)]/8"
+                            : "border-white/10 bg-white/[0.03]"
+                        }`}
+                      >
+                        <button
+                          type="button"
+                          aria-expanded={active}
+                          aria-controls={`tour-hotspot-panel-${hotspot.id}`}
+                          onClick={() => (active ? setActiveHotspotId(null) : openHotspot(hotspot.id))}
+                          className="flex w-full items-center gap-3 px-4 py-3 text-left"
+                        >
+                          <span
+                            className={`grid size-7 shrink-0 place-items-center rounded-full border text-xs font-semibold ${
+                              visited
+                                ? "border-[color:var(--primary)]/40 text-[color:var(--primary-soft)]"
+                                : "border-white/20 text-[color:var(--text-primary)]"
+                            }`}
+                          >
+                            {visited ? "✓" : index + 1}
+                          </span>
+                          <span className="flex-1 font-semibold text-[color:var(--text-primary)]">{hotspot.label}</span>
+                          <span aria-hidden="true" className="text-[color:var(--text-secondary)]">
+                            {active ? "−" : "+"}
+                          </span>
+                        </button>
+                        {active ? (
+                          <div id={`tour-hotspot-panel-${hotspot.id}`} className="px-4 pb-4">
+                            <p className="text-sm leading-7 text-[color:var(--text-primary)]">{hotspot.attention}</p>
+                            <div className="mt-3 rounded-2xl border border-[color:var(--primary)]/20 bg-[color:var(--primary)]/8 px-4 py-3">
+                              <p className="text-xs font-semibold text-[color:var(--primary-soft)]">法規依據</p>
+                              <p className="mt-1 text-xs leading-6 text-[color:var(--text-secondary)]">{hotspot.basis}</p>
+                            </div>
+                          </div>
+                        ) : null}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ) : (
+              <div className="tour-3d-frame relative aspect-[4/3] w-full overflow-hidden sm:aspect-video">
+                <SceneErrorBoundary key={scene.id} onError={switchToListMode}>
+                  <SceneIllustration sceneId={scene.id} onContextLost={switchToListMode} />
+                </SceneErrorBoundary>
+                {scene.hotspots.map((hotspot, index) => {
+                  const visited = visitedIds.includes(hotspot.id);
+                  const active = hotspot.id === activeHotspotId;
 
-              {activeHotspot ? (
-                <div
-                  id="tour-hotspot-dialog"
-                  role="dialog"
-                  aria-modal="false"
-                  aria-labelledby="tour-hotspot-title"
-                  style={
-                    {
-                      "--hotspot-x": `${activeHotspot.x}%`,
-                      "--hotspot-y": `${activeHotspot.y}%`,
-                    } as CSSProperties
-                  }
-                  className="tour-hotspot-dialog absolute z-20 max-h-[72%] overflow-y-auto rounded-2xl border border-white/15 bg-[#121827]/95 p-4 shadow-2xl backdrop-blur-md sm:rounded-3xl sm:p-5"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="eyebrow text-xs">注意事項</p>
-                      <h3 id="tour-hotspot-title" className="mt-1 text-xl font-semibold text-[color:var(--text-primary)]">
-                        {activeHotspot.label}
-                      </h3>
-                    </div>
+                  return (
                     <button
+                      key={hotspot.id}
                       type="button"
-                      aria-label="關閉說明"
-                      onClick={() => setActiveHotspotId(null)}
-                      className="grid size-9 shrink-0 place-items-center rounded-full border border-white/15 bg-white/5 text-lg text-[color:var(--text-secondary)] transition hover:bg-white/10 hover:text-white"
+                      aria-label={hotspot.label}
+                      aria-pressed={active}
+                      aria-controls={active ? "tour-hotspot-dialog" : undefined}
+                      onClick={() => openHotspot(hotspot.id)}
+                      style={{ left: `${hotspot.x}%`, top: `${hotspot.y}%` }}
+                      className={`absolute z-10 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition sm:text-sm ${
+                        active
+                          ? "border-[color:var(--primary)] bg-[color:var(--primary)] text-white"
+                          : visited
+                            ? "border-[color:var(--primary)]/40 bg-black/70 text-[color:var(--primary-soft)]"
+                            : "border-white/20 bg-black/70 text-[color:var(--text-primary)]"
+                      }`}
                     >
-                      ×
+                      <span>{visited ? "✓" : index + 1}</span>
+                      <span>{hotspot.label}</span>
                     </button>
+                  );
+                })}
+
+                {activeHotspot ? (
+                  <div
+                    id="tour-hotspot-dialog"
+                    role="dialog"
+                    aria-modal="false"
+                    aria-labelledby="tour-hotspot-title"
+                    style={
+                      {
+                        "--hotspot-x": `${activeHotspot.x}%`,
+                        "--hotspot-y": `${activeHotspot.y}%`,
+                      } as CSSProperties
+                    }
+                    className="tour-hotspot-dialog absolute z-20 max-h-[72%] overflow-y-auto rounded-2xl border border-white/15 bg-[#121827]/95 p-4 shadow-2xl backdrop-blur-md sm:rounded-3xl sm:p-5"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <p className="eyebrow text-xs">注意事項</p>
+                        <h3 id="tour-hotspot-title" className="mt-1 text-xl font-semibold text-[color:var(--text-primary)]">
+                          {activeHotspot.label}
+                        </h3>
+                      </div>
+                      <button
+                        type="button"
+                        aria-label="關閉說明"
+                        onClick={() => setActiveHotspotId(null)}
+                        className="grid size-9 shrink-0 place-items-center rounded-full border border-white/15 bg-white/5 text-lg text-[color:var(--text-secondary)] transition hover:bg-white/10 hover:text-white"
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <p className="mt-3 text-sm leading-7 text-[color:var(--text-primary)]">{activeHotspot.attention}</p>
+                    <div className="mt-4 rounded-2xl border border-[color:var(--primary)]/20 bg-[color:var(--primary)]/8 px-4 py-3">
+                      <p className="text-xs font-semibold text-[color:var(--primary-soft)]">法規依據</p>
+                      <p className="mt-1 text-xs leading-6 text-[color:var(--text-secondary)]">{activeHotspot.basis}</p>
+                    </div>
                   </div>
-                  <p className="mt-3 text-sm leading-7 text-[color:var(--text-primary)]">{activeHotspot.attention}</p>
-                  <div className="mt-4 rounded-2xl border border-[color:var(--primary)]/20 bg-[color:var(--primary)]/8 px-4 py-3">
-                    <p className="text-xs font-semibold text-[color:var(--primary-soft)]">法規依據</p>
-                    <p className="mt-1 text-xs leading-6 text-[color:var(--text-secondary)]">{activeHotspot.basis}</p>
-                  </div>
-                </div>
-              ) : (
-                <p className="absolute bottom-3 left-3 z-10 rounded-full border border-white/15 bg-black/70 px-3 py-2 text-xs text-[color:var(--text-primary)] backdrop-blur-sm sm:bottom-5 sm:left-5 sm:text-sm">
-                  點選場景標記查看注意事項
-                </p>
-              )}
-            </div>
+                ) : (
+                  <p className="absolute bottom-3 left-3 z-10 rounded-full border border-white/15 bg-black/70 px-3 py-2 text-xs text-[color:var(--text-primary)] backdrop-blur-sm sm:bottom-5 sm:left-5 sm:text-sm">
+                    點選場景標記查看注意事項
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="flex justify-end">

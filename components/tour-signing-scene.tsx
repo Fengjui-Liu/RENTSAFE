@@ -160,7 +160,9 @@ function DeskScene() {
   );
 }
 
-export default function TourSigningScene() {
+type SceneProps = { onContextLost?: () => void };
+
+export default function TourSigningScene({ onContextLost }: SceneProps) {
   return (
     <Canvas
       aria-hidden="true"
@@ -169,6 +171,9 @@ export default function TourSigningScene() {
       dpr={[1, 1.5]}
       gl={{ antialias: true, powerPreference: "high-performance" }}
       shadows
+      onCreated={({ gl }) => {
+        gl.domElement.addEventListener("webglcontextlost", () => onContextLost?.(), { once: true });
+      }}
     >
       <DeskScene />
     </Canvas>

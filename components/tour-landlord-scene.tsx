@@ -222,7 +222,9 @@ function LandlordRoom() {
   );
 }
 
-export default function TourLandlordScene() {
+type SceneProps = { onContextLost?: () => void };
+
+export default function TourLandlordScene({ onContextLost }: SceneProps) {
   return (
     <Canvas
       aria-hidden="true"
@@ -231,6 +233,9 @@ export default function TourLandlordScene() {
       dpr={[1, 1.5]}
       gl={{ antialias: true, powerPreference: "high-performance" }}
       shadows
+      onCreated={({ gl }) => {
+        gl.domElement.addEventListener("webglcontextlost", () => onContextLost?.(), { once: true });
+      }}
     >
       <LandlordRoom />
     </Canvas>

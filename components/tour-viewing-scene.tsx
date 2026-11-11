@@ -208,7 +208,9 @@ function ViewingRoom() {
   );
 }
 
-export default function TourViewingScene() {
+type SceneProps = { onContextLost?: () => void };
+
+export default function TourViewingScene({ onContextLost }: SceneProps) {
   return (
     <Canvas
       aria-hidden="true"
@@ -217,6 +219,9 @@ export default function TourViewingScene() {
       dpr={[1, 1.5]}
       gl={{ antialias: true, powerPreference: "high-performance" }}
       shadows
+      onCreated={({ gl }) => {
+        gl.domElement.addEventListener("webglcontextlost", () => onContextLost?.(), { once: true });
+      }}
     >
       <ViewingRoom />
     </Canvas>
