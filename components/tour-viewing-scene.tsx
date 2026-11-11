@@ -211,6 +211,15 @@ function ViewingRoom() {
 type SceneProps = { onContextLost?: () => void };
 
 export default function TourViewingScene({ onContextLost }: SceneProps) {
+  // 切換場景時 R3F 卸載 Canvas 會主動讓 context 失效；只有仍掛載時的 context lost 才算真的失效
+  const mounted = useRef(true);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+
   return (
     <Canvas
       aria-hidden="true"
@@ -220,7 +229,9 @@ export default function TourViewingScene({ onContextLost }: SceneProps) {
       gl={{ antialias: true, powerPreference: "high-performance" }}
       shadows
       onCreated={({ gl }) => {
-        gl.domElement.addEventListener("webglcontextlost", () => onContextLost?.(), { once: true });
+        gl.domElement.addEventListener("webglcontextlost", () => {
+          if (mounted.current) onContextLost?.();
+        }, { once: true });
       }}
     >
       <ViewingRoom />
