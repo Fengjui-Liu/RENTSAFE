@@ -12,7 +12,7 @@ export function DemoCasePicker({ cases, selectedId, onLoad, onReset, compact = f
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="eyebrow">展示模式</p>
-          <p className="mt-2 text-sm text-[color:var(--text-secondary)]">選一個預設案例，一鍵跑完整輪；不需網路</p>
+          <p className="mt-2 text-sm text-[color:var(--text-secondary)]">預設案例・離線可用</p>
         </div>
         <button type="button" className="button-secondary" onClick={onReset}>
           重置

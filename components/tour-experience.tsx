@@ -109,7 +109,6 @@ export function TourExperience() {
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <p className="eyebrow">示範房</p>
             <span className="inline-flex rounded-full border border-white/10 bg-black/30 px-2 py-1 text-xs text-[color:var(--text-muted)]">
               情境示範
             </span>
@@ -182,7 +181,9 @@ export function TourExperience() {
             <p className="mb-3 text-sm text-[color:var(--text-secondary)]">{scene.description}</p>
             {listMode ? (
               <div>
-                <p className="mb-3 text-xs text-[color:var(--text-muted)]">此裝置無法顯示 3D，已切換為清單模式</p>
+                <span className="mb-3 inline-flex rounded-full border border-white/10 bg-black/30 px-2 py-1 text-xs text-[color:var(--text-muted)]">
+                  清單模式・此裝置不支援 3D
+                </span>
                 <ul className="space-y-3">
                   {scene.hotspots.map((hotspot, index) => {
                     const visited = visitedIds.includes(hotspot.id);
@@ -302,7 +303,7 @@ export function TourExperience() {
                   </div>
                 ) : (
                   <p className="absolute bottom-3 left-3 z-10 rounded-full border border-white/15 bg-black/70 px-3 py-2 text-xs text-[color:var(--text-primary)] backdrop-blur-sm sm:bottom-5 sm:left-5 sm:text-sm">
-                    點選場景標記查看注意事項
+                    點標記查看
                   </p>
                 )}
               </div>
@@ -315,7 +316,7 @@ export function TourExperience() {
               className="button-secondary min-w-52 justify-center"
               onClick={() => (isLastScene ? setShowSummary(true) : goToScene(sceneIndex + 1))}
             >
-              {isLastScene ? "看看檢查了哪些" : `下一站：${tourScenes[sceneIndex + 1].title}`}
+              {isLastScene ? "查看總結" : `下一站：${tourScenes[sceneIndex + 1].title}`}
             </button>
           </div>
         </div>

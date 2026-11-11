@@ -17,15 +17,11 @@ export default async function CheckPage({
         <p className="eyebrow">智慧物件查核</p>
 
         <h1 className="font-serif text-5xl leading-tight text-[color:var(--text-primary)]">
-          上傳租屋截圖或手動輸入，取得綜合租屋評估
+          這間房，租金合理嗎？
         </h1>
 
         <p className="max-w-3xl text-base leading-8 text-[color:var(--text-secondary)]">
-          RentSafe 提供兩種物件查核方式：
-          上傳租屋廣告截圖，由 OCR 自動擷取租屋資訊；
-          或手動輸入行政區、出租型態與月租金。
-          系統將對照臺北市租賃行情資料，
-          提供租金合理性分析、風險提醒與綜合建議。
+          與同行政區、同建物類型的實價登錄租金中位數比較
         </p>
       </section>
 

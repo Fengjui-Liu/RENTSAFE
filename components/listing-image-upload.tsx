@@ -212,7 +212,7 @@ export function ListingImageUpload({
       onRecognized?.(listingInfo);
     } catch (err) {
       console.error("OCR 辨識失敗：", err);
-      setError("辨識失敗，請確認網路連線並重新嘗試。");
+      setError("OCR 需要網路連線，離線請改用手動輸入");
     } finally {
       if (worker) {
         await worker.terminate();
@@ -232,11 +232,6 @@ export function ListingImageUpload({
         <h2 className="mt-2 text-2xl font-semibold text-white">
           上傳租屋廣告截圖
         </h2>
-
-        <p className="mt-2 text-sm leading-6 text-gray-400">
-          系統會嘗試辨識行政區、出租型態、
-          月租金與額外費用。
-        </p>
       </div>
 
       <input
@@ -313,8 +308,7 @@ export function ListingImageUpload({
           </div>
 
           <p className="text-xs leading-6 text-amber-200">
-            辨識結果可能有誤，請確認下方表單，
-            再進行租金行情分析。
+            辨識可能有誤，請核對
           </p>
         </div>
       )}

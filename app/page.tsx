@@ -46,20 +46,16 @@ function buildPreview() {
 
   const rent = getRentBenchmark(demoCase.district, demoCase.rentalType, demoCase.listedRent);
   const rentPlace = `${rent.district}${rent.rentalType}`;
-  const sampleText =
-    rent.buildingCount !== undefined
-      ? `樣本 ${rent.sampleSize} 筆，來自 ${rent.buildingCount} 棟建物`
-      : `樣本 ${rent.sampleSize} 筆`;
 
   const rentCard: PreviewCard =
     rent.kind === "ready"
       ? {
           title: `月租 ${formatRent(rent.listedRent)}，${rent.label}`,
-          detail: `${rentPlace}中位數 ${formatRent(rent.rent.median)}（${
+          detail: `${rentPlace}中位數 ${formatRent(rent.rent.median)}・${
             rent.deviation >= 0 ? "高於" : "低於"
-          } ${Math.abs(rent.deviation)}%），第 25–75 百分位 ${formatRent(rent.rent.p25)}–${formatRent(
+          } ${Math.abs(rent.deviation)}%・第 25–75 百分位 ${formatRent(rent.rent.p25)}–${formatRent(
             rent.rent.p75,
-          )}；${sampleText}${rent.lowDiversity ? "，樣本集中於少數建物，僅供參考" : ""}`,
+          )}${rent.lowDiversity ? "・樣本集中於少數建物，僅供參考" : ""}`,
           level: statusToLevel(rent.status),
           source: "real",
           period: rent.period,
@@ -150,15 +146,18 @@ export default function Home() {
           {/* 預覽：外層容器（panel）＋內容區（卡片），最多兩層 */}
           <div className="panel animate-enter-delayed p-6 lg:p-7">
             <div className="mb-5 space-y-2">
-              <p className="text-sm text-[color:var(--text-secondary)]">查核摘要・{preview.title}（展示案例）</p>
+              <p className="text-sm text-[color:var(--text-secondary)]">查核摘要・{preview.title}</p>
               <p className="text-2xl font-semibold text-[color:var(--text-primary)]">
                 <span className="text-red-300">高風險 {preview.counts.high} 項</span>
                 <span className="text-[color:var(--text-muted)]">・</span>
                 <span className="text-amber-300">需注意 {preview.counts.attention} 項</span>
+                {preview.counts.self > 0 && (
+                  <>
+                    <span className="text-[color:var(--text-muted)]">・</span>
+                    <span className="text-amber-200">需自行確認 {preview.counts.self} 項</span>
+                  </>
+                )}
               </p>
-              {preview.counts.self > 0 && (
-                <p className="text-sm text-[color:var(--text-secondary)]">另有 {preview.counts.self} 項需自行確認</p>
-              )}
               <p className="text-sm text-[color:var(--text-secondary)]">
                 來源：租金為內政部實價登錄（{preview.period}）；其餘為示範資料
               </p>
@@ -192,14 +191,9 @@ export default function Home() {
       </section>
 
       <section className="space-y-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="eyebrow">核心功能</p>
-            <h2 className="font-serif text-4xl text-[color:var(--text-primary)]">把租屋風險拆成可判斷的訊號</h2>
-          </div>
-          <p className="max-w-xl text-sm leading-7 text-[color:var(--text-secondary)]">
-            看房到簽約，一頁說清
-          </p>
+        <div>
+          <p className="eyebrow">核心功能</p>
+          <h2 className="font-serif text-4xl text-[color:var(--text-primary)]">把租屋風險拆成可判斷的訊號</h2>
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">

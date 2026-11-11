@@ -163,7 +163,7 @@ export const mockContractResult = {
 export const featureCards = [
   {
     title: "建案合法性",
-    description: "比對建物登記謄本，揪出坪數灌水、頂樓加蓋與非法隔間。",
+    description: "列出坪數、增建、隔間的現況確認重點，提醒你向房東確認（示範資料）",
     href: "/check",
   },
   {

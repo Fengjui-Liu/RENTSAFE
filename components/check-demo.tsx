@@ -27,23 +27,20 @@ type InputMethod = "manual" | "upload";
 const confirmationItems = [
   {
     title: "建物登記與違建",
-    detail:
-      "目前尚未自動查證。請要求出租人說明有無未登記增建、加建或違建，並填寫現況確認書第 1 項。",
+    detail: "請房東說明有無增建、加建或違建（現況確認書第 1 項）",
   },
   {
     title: "隔間與出租型態",
-    detail:
-      "請現場核對格局與出租型態，並要求出租人填寫現況確認書第 2 項。",
+    detail: "現場核對格局，請房東填寫現況確認書第 2 項",
   },
   {
     title: "凶宅風險提醒",
     detail:
-      "沒有官方資料庫可證明是否曾發生非自然死亡；請要求出租人填寫現況確認書第 8 項，並自行查詢新聞或詢問管理員。",
+      "沒有官方凶宅資料庫；請房東填寫現況確認書第 8 項，房東可勾「不知道」，不等於保證沒有",
   },
   {
     title: "租金補貼",
-    detail:
-      "資格請依主管機關公告確認；簽約時要留意，範本明載「承租人不得申請租金補貼」這類條款無效。",
+    detail: "範本明載「承租人不得申請租金補貼」條款無效；資格依主管機關公告",
   },
 ] as const;
 
@@ -57,16 +54,12 @@ function formatCurrency(value: number) {
 
 function OverallReport({
   result,
-  mode,
 }: {
   result: RentBenchmarkResult;
-  mode: CheckMode;
 }) {
   const hasBenchmark =
     result.kind !== "unavailable" &&
     result.kind !== "insufficient";
-
-  const deviation = hasBenchmark ? result.deviation : null;
 
   let summary = "目前無法判定租金行情，建議補充資料後再評估。";
   let recommendation =
@@ -91,15 +84,12 @@ function OverallReport({
   return (
     <section className="space-y-5 rounded-3xl border border-orange-500/20 bg-orange-500/5 p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <p className="eyebrow">RentSafe 綜合評估</p>
-          <h3 className="mt-2 text-2xl font-semibold text-[color:var(--text-primary)]">
-            物件初步查核報告
-          </h3>
-        </div>
+        <h3 className="text-2xl font-semibold text-[color:var(--text-primary)]">
+          查核結果
+        </h3>
 
         <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-200">
-          待進一步確認
+          待確認
         </span>
       </div>
 
@@ -117,77 +107,39 @@ function OverallReport({
 
       <div className="space-y-2">
         <h4 className="font-semibold text-[color:var(--text-primary)]">
-          一、租金合理性
+          租金行情
         </h4>
 
         {hasBenchmark ? (
           <div className="space-y-2 text-sm leading-7 text-[color:var(--text-secondary)]">
-            <p>
-              臺北市{result.district}的{result.rentalType}，
-              同類型物件月租金中位數約為
-              <strong className="text-[color:var(--text-primary)]">
-                {formatCurrency(result.rent.median)}
-              </strong>
-              。
-            </p>
-
-            <p>
-              這間物件的廣告月租金為
-              {formatCurrency(result.listedRent)}，
-              {deviation !== null && deviation > 0
-                ? `高於中位數 ${deviation}%`
-                : deviation !== null && deviation < 0
-                  ? `低於中位數 ${Math.abs(deviation)}%`
-                  : "與中位數相同"}
-              。
-            </p>
-
             <p>{summary}</p>
 
             <SampleDiversity result={result} />
           </div>
         ) : (
           <p className="text-sm leading-7 text-amber-200">
-            目前缺少足夠的同區同房型租賃樣本，
-            因此不提供租金合理性判定。
+            樣本不足・不判定租金行情
           </p>
         )}
       </div>
 
       <div className="space-y-2">
         <h4 className="font-semibold text-[color:var(--text-primary)]">
-          二、其他風險與資訊完整性
+          其他風險
         </h4>
 
         <p className="text-sm leading-7 text-[color:var(--text-secondary)]">
-          目前尚未自動驗證建物登記、違建、
-          室內隔間、屋況、非自然死亡紀錄及租約條款。
-          這些項目需要另外查證，不能因租金合理就認定房屋安全。
+          建物、違建、隔間、凶宅、條款：未自動查證。租金合理不代表房屋安全。
         </p>
       </div>
 
       <div className="space-y-2">
         <h4 className="font-semibold text-[color:var(--text-primary)]">
-          三、綜合建議
+          建議
         </h4>
 
         <p className="text-sm leading-7 text-[color:var(--text-secondary)]">
           {recommendation}
-        </p>
-      </div>
-
-      <div className="border-t border-white/10 pt-4">
-        <p className="text-xs leading-6 text-[color:var(--text-muted)]">
-          資料來源：
-          {mode === "demo"
-            ? "展示案例（租金行情為實際資料；其他風險為模擬情境）"
-            : mode === "upload"
-              ? "使用者上傳截圖並確認的租屋資訊"
-              : "使用者手動輸入的租屋資訊"}
-          。
-          租金行情依系統現有資料計算。
-          本報告僅提供初步輔助評估，不代表建物合法性或居住安全認證。
-          ±20% 為暫定的產品提醒門檻，並非法定標準。
         </p>
       </div>
     </section>
@@ -206,8 +158,7 @@ function RentResult({
   if (result.kind === "unavailable") {
     return (
       <div className="border-l-2 border-amber-500/60 pl-4 text-sm leading-7 text-amber-100">
-        目前沒有「{result.district}・{result.rentalType}」的可用樣本，
-        因此不判定行情高低。你可以改選其他出租型態。
+        {result.district}・{result.rentalType}：資料不足・不判定行情高低
       </div>
     );
   }
@@ -215,10 +166,7 @@ function RentResult({
   if (result.kind === "insufficient") {
     return (
       <div className="space-y-3 border-l-2 border-amber-500/60 pl-4 text-sm leading-7 text-amber-100">
-        <p>
-          目前只有 {result.sampleSize} 筆有效樣本，
-          少於最低門檻 10 筆，因此不提供中位數或行情判定。
-        </p>
+        <p>樣本不足（{result.sampleSize} / 10 筆）・不判定行情高低</p>
         <SourceTag
           source="real"
           period={result.period}
@@ -294,6 +242,7 @@ function RentResult({
       <details className="text-xs leading-6 text-[color:var(--text-muted)]">
         <summary className="cursor-pointer">查看統計方法</summary>
         <p className="mt-2">{result.method}</p>
+        <p className="mt-2">±20% 為暫定提醒門檻，不是法定標準。</p>
       </details>
     </div>
   );
@@ -423,7 +372,7 @@ export function CheckDemo({
     ].filter((value) => value !== undefined).length;
 
     setOcrMessage(
-      `已辨識 ${recognizedCount}/3 項關鍵資訊。請確認下方欄位，未辨識的欄位需要手動補充。`
+      `已辨識 ${recognizedCount}/3 項・請確認`
     );
   };
 
@@ -508,18 +457,10 @@ export function CheckDemo({
       {/* 左側：輸入區域 */}
       <div className="space-y-6">
         <section className="panel p-6 sm:p-8">
-          <div className="mb-6 space-y-3">
-            <p className="eyebrow">智慧物件查核</p>
-
+          <div className="mb-6">
             <h2 className="font-serif text-3xl text-[color:var(--text-primary)]">
-              輸入物件租屋條件
+              物件條件
             </h2>
-
-            <p className="text-sm leading-7 text-[color:var(--text-secondary)]">
-              選擇上傳租屋廣告截圖，或手動輸入租屋資訊。
-              兩種方式都會使用相同的租金行情分析，
-              並產生綜合查核報告。
-            </p>
           </div>
 
           <div className="space-y-5">
@@ -579,19 +520,11 @@ export function CheckDemo({
 
             {/* 共用確認表單 */}
             <div className="space-y-4 rounded-2xl border border-white/10 bg-black/10 p-4">
-              <div>
-                <h3 className="font-semibold text-[color:var(--text-primary)]">
-                  {inputMethod === "upload"
-                    ? "確認 OCR 辨識資訊"
-                    : "填寫租屋資訊"}
-                </h3>
-
-                <p className="mt-2 text-xs leading-6 text-[color:var(--text-secondary)]">
-                  {inputMethod === "upload"
-                    ? "請確認自動填入的資料是否正確。辨識失敗的欄位可以自行修改。"
-                    : "請輸入物件所在行政區、出租型態與每月租金。"}
-                </p>
-              </div>
+              <h3 className="font-semibold text-[color:var(--text-primary)]">
+                {inputMethod === "upload"
+                  ? "確認 OCR 辨識資訊"
+                  : "填寫租屋資訊"}
+              </h3>
 
               <SelectField
                 label="行政區"
@@ -680,21 +613,16 @@ export function CheckDemo({
 
               {mode === "demo" && (
                 <p className="mt-2 text-sm text-[color:var(--text-secondary)]">
-                  租金行情使用真實資料；
-                  下方建物與屋況內容為情境示範。
+                  租金行情為真實資料；建物與屋況為情境示範
                 </p>
               )}
             </div>
 
             {/* 新增統一綜合報告 */}
-            <OverallReport result={result} mode={mode} />
+            <OverallReport result={result} />
 
             {/* 原本租金行情結果 */}
             <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
-              <h4 className="mb-4 text-lg font-semibold text-[color:var(--text-primary)]">
-                詳細租金行情
-              </h4>
-
               <RentResult result={result} />
             </div>
 
@@ -753,24 +681,9 @@ function SelectField({
 function EmptyResult() {
   return (
     <div className="flex min-h-96 flex-col justify-between gap-8">
-      <div className="space-y-3">
-        <p className="eyebrow">結果預覽</p>
-
-        <h3 className="font-serif text-3xl text-[color:var(--text-primary)]">
-          上傳截圖或手動輸入，取得綜合評估
-        </h3>
-
-        <p className="text-sm leading-7 text-[color:var(--text-secondary)]">
-          系統會依據行政區、出租型態與租金，
-          比較真實租賃行情，並產生初步查核建議。
-          建物合法性與居住安全仍需另外確認。
-        </p>
-      </div>
-
-      <div className="rounded-3xl border border-[color:var(--primary)]/20 bg-[color:var(--primary)]/8 p-5 text-sm leading-7 text-[color:var(--text-secondary)]">
-        你也可以載入左側展示案例，
-        快速了解租金行情分析與其他風險提醒的呈現方式。
-      </div>
+      <h3 className="font-serif text-3xl text-[color:var(--text-primary)]">
+        結果預覽
+      </h3>
     </div>
   );
 }
@@ -778,24 +691,21 @@ function EmptyResult() {
 function ConfirmationList() {
   return (
     <div className="space-y-4">
-      <div>
-        <h4 className="text-lg font-semibold text-[color:var(--text-primary)]">
-          其他風險仍需確認
-        </h4>
-
-        <p className="mt-1 text-sm text-[color:var(--text-secondary)]">
-          以下不是自動查詢結果，也不納入租金行情判定。
-        </p>
-      </div>
+      <h4 className="text-lg font-semibold text-[color:var(--text-primary)]">
+        其他風險仍需確認
+      </h4>
 
       {confirmationItems.map((item) => (
         <article
           key={item.title}
           className="rounded-2xl border border-amber-500/15 bg-amber-500/8 p-4"
         >
-          <p className="font-medium text-amber-100">
-            {item.title}・尚未自動查證
-          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="font-medium text-amber-100">{item.title}</p>
+            <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-xs font-semibold text-amber-200">
+              未查證
+            </span>
+          </div>
 
           <p className="mt-2 text-sm leading-7 text-[color:var(--text-secondary)]">
             {item.detail}

@@ -304,10 +304,9 @@ export function ContractDemo({ initialCaseId }: { initialCaseId?: string }) {
               PDF
             </span>
             <span className="text-lg font-semibold text-[color:var(--text-primary)]">拖曳或點擊選擇合約 PDF</span>
-            <span className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
-              在你的瀏覽器裡讀取文字並依範本規則比對，檔案不會上傳到任何伺服器。
-              <br />
-              需為有文字層的 PDF；掃描檔請改貼上文字。
+            <span className="mt-3 flex flex-wrap justify-center gap-2 text-xs text-[color:var(--text-secondary)]">
+              <span className="rounded-full border border-white/10 bg-black/30 px-3 py-1">瀏覽器內解析，不上傳</span>
+              <span className="rounded-full border border-white/10 bg-black/30 px-3 py-1">需有文字層</span>
             </span>
             <input
               type="file"
@@ -341,7 +340,7 @@ export function ContractDemo({ initialCaseId }: { initialCaseId?: string }) {
           </div>
 
           <label className="mt-6 block space-y-2">
-            <span className="text-sm text-[color:var(--text-secondary)]">貼上合約文字（依住宅租賃契約書範本規則比對）</span>
+            <span className="text-sm text-[color:var(--text-secondary)]">貼上合約文字</span>
             <textarea
               value={contractText}
               onChange={(event) => setContractText(event.target.value)}
@@ -362,8 +361,7 @@ export function ContractDemo({ initialCaseId }: { initialCaseId?: string }) {
           </button>
 
           <div className="mt-6 rounded-3xl border border-white/10 bg-white/[0.03] p-4">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-sm text-[color:var(--text-secondary)]">沒有合約可以試？</p>
+            <div className="flex justify-end">
               <SourceTag source="mock" />
             </div>
             <button
@@ -380,13 +378,7 @@ export function ContractDemo({ initialCaseId }: { initialCaseId?: string }) {
         <section className="panel p-6 sm:p-8">
           {phase === "idle" && (
             <div className="flex h-full min-h-96 flex-col justify-between">
-              <div className="space-y-3">
-                <p className="eyebrow">結果預覽</p>
-                <h3 className="font-serif text-3xl text-[color:var(--text-primary)]">條款風險一眼看懂</h3>
-                <p className="text-sm leading-7 text-[color:var(--text-secondary)]">
-                  報告會標示高風險、需注意與低風險條款，並補上原文、問題說明與簽約前建議。
-                </p>
-              </div>
+              <h3 className="font-serif text-3xl text-[color:var(--text-primary)]">結果預覽</h3>
 
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
@@ -409,12 +401,7 @@ export function ContractDemo({ initialCaseId }: { initialCaseId?: string }) {
 
           {phase === "loading" && loading && (
             <div className="space-y-6">
-              <div>
-                <p className="eyebrow">審查中</p>
-                <h3 className="mt-3 font-serif text-3xl text-[color:var(--text-primary)]">
-                  {loading.kind === "mock" ? "正在載入示範合約的審查結果" : "正在依住宅租賃契約書範本規則比對條款"}
-                </h3>
-              </div>
+              <p className="eyebrow">審查中</p>
               {loading.kind === "pdf" ? (
                 <PdfSteps loading={loading} />
               ) : (
@@ -457,7 +444,7 @@ export function ContractDemo({ initialCaseId }: { initialCaseId?: string }) {
                   </p>
                   {rulesView.result.normalized.excludedNotes && (
                     <p className="rounded-3xl border border-white/10 bg-white/[0.03] p-4 text-sm leading-7 text-[color:var(--text-secondary)]">
-                      已排除簽約注意事項段落：「簽約注意事項」標題之後的文字不送規則比對，可在下方展開查看。
+                      已排除簽約注意事項段落
                     </p>
                   )}
                   {rulesView.emptyPages && rulesView.emptyPages.length > 0 && (
@@ -470,7 +457,8 @@ export function ContractDemo({ initialCaseId }: { initialCaseId?: string }) {
 
               {rulesView && rulesView.result.clauses.length === 0 && (
                 <div className="rounded-3xl border border-amber-500/15 bg-amber-500/8 p-5 text-sm leading-7 text-amber-100">
-                  沒有命中任何規則。這不代表合約沒有問題：目前規則只涵蓋部分範本條款，其他條款請自行對照住宅租賃契約書範本。
+                  <p className="font-semibold">未命中規則（不代表沒問題）</p>
+                  <p className="mt-1">{RULES_DISCLAIMER}</p>
                 </div>
               )}
 
@@ -538,23 +526,6 @@ export function ContractDemo({ initialCaseId }: { initialCaseId?: string }) {
                   )}
                 </div>
               )}
-
-              <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
-                <h4 className="text-lg font-semibold text-[color:var(--text-primary)]">延伸資源</h4>
-                <div className="mt-4 flex flex-wrap gap-3">
-                  {mockContractResult.resources.map((resource) => (
-                    <a
-                      key={resource.url}
-                      href={resource.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="rounded-full border border-white/10 px-4 py-2 text-sm text-[color:var(--text-secondary)] transition hover:border-[color:var(--primary)]/30 hover:text-[color:var(--text-primary)]"
-                    >
-                      {resource.name}
-                    </a>
-                  ))}
-                </div>
-              </div>
             </div>
           )}
         </section>
