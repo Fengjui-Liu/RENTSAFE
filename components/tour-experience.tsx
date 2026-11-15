@@ -6,7 +6,7 @@ import { Component, useEffect, useState, useSyncExternalStore } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import {
   getTourScenes,
-  pressureScenario,
+  pressureQuestions,
   tourHouse,
   tourProfiles,
   type TourHotspot,
@@ -185,24 +185,48 @@ function HotspotDetail({
 }
 
 function PressurePanel() {
-  const [chosen, setChosen] = useState<string | null>(null);
-  const option = pressureScenario.options.find((item) => item.id === chosen) ?? null;
+  const [index, setIndex] = useState(0);
+  const [chosen, setChosen] = useState<Record<string, string>>({});
+  const question = pressureQuestions[index];
+  const option = question.options.find((item) => item.id === chosen[question.id]) ?? null;
 
   return (
     <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
-      <p className="eyebrow text-xs">{pressureScenario.title}</p>
-      <p className="mt-2 text-base font-semibold text-[color:var(--text-primary)]">{pressureScenario.line}</p>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="eyebrow text-xs">
+          情境 {index + 1} / {pressureQuestions.length}：{question.title}
+        </p>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            disabled={index === 0}
+            onClick={() => setIndex(index - 1)}
+            className="min-h-11 rounded-full border border-white/15 px-4 text-sm text-[color:var(--text-secondary)] transition hover:text-white disabled:opacity-40"
+          >
+            上一題
+          </button>
+          <button
+            type="button"
+            disabled={index === pressureQuestions.length - 1}
+            onClick={() => setIndex(index + 1)}
+            className="min-h-11 rounded-full border border-white/15 px-4 text-sm text-[color:var(--text-secondary)] transition hover:text-white disabled:opacity-40"
+          >
+            下一題
+          </button>
+        </div>
+      </div>
+      <p className="mt-2 text-base font-semibold text-[color:var(--text-primary)]">{question.line}</p>
       <p className="mt-1 text-xs text-[color:var(--text-muted)]">你會怎麼回？沒有標準答案，不計分。</p>
       <div className="mt-3 flex flex-wrap gap-2">
-        {pressureScenario.options.map((item) => (
+        {question.options.map((item) => (
           <button
             key={item.id}
             type="button"
-            aria-pressed={chosen === item.id}
-            onClick={() => setChosen(item.id)}
-            className={`rounded-full border px-4 py-2 text-sm transition ${
-              chosen === item.id
-                ? "border-[color:var(--accent)] bg-[color:var(--accent)]/15 text-[color:var(--text-primary)]"
+            aria-pressed={chosen[question.id] === item.id}
+            onClick={() => setChosen((current) => ({ ...current, [question.id]: item.id }))}
+            className={`min-h-11 rounded-full border px-4 py-2 text-left text-sm transition ${
+              chosen[question.id] === item.id
+                ? "border-[color:var(--accent)]/60 bg-[color:var(--accent)]/12 text-[color:var(--text-primary)]"
                 : "border-white/15 text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]"
             }`}
           >
@@ -289,7 +313,7 @@ function downloadChecklistImage(items: { where: string; ask: string }[]) {
 }
 
 export function TourExperience() {
-  const [profileId, setProfileId] = useState<TourProfileId>("rooftop");
+  const profileId: TourProfileId = "rooftop";
   const [sceneIndex, setSceneIndex] = useState(0);
   const [activeHotspotId, setActiveHotspotId] = useState<string | null>(null);
   const [guesses, setGuesses] = useState<Record<string, Guess>>({});
@@ -336,11 +360,6 @@ export function TourExperience() {
     setShowSummary(false);
   };
 
-  const changeProfile = (id: TourProfileId) => {
-    setProfileId(id);
-    restart();
-  };
-
   const checklist = scenes.flatMap((item) =>
     item.hotspots
       .filter((hotspot) => hotspot.kind === "risk" && visitedIds.includes(hotspot.id))
@@ -352,38 +371,14 @@ export function TourExperience() {
     <section className="panel p-6 sm:p-8">
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="inline-flex rounded-full border border-white/10 bg-black/30 px-2 py-1 text-xs text-[color:var(--text-muted)]">
-              情境示範・虛構房源
-            </span>
-          </div>
-          <h2 className="mt-3 text-2xl font-semibold text-[color:var(--text-primary)]">{profile.title}</h2>
+          <h2 className="text-2xl font-semibold text-[color:var(--text-primary)]">{profile.title}（示範）</h2>
           <p className="mt-2 text-sm text-[color:var(--text-secondary)]">
-            {profileId === "rooftop" ? tourHouse.description : profile.note}
+            {tourHouse.description}
           </p>
         </div>
         <p className="rounded-full border border-[color:var(--accent)]/30 bg-[color:var(--accent)]/8 px-4 py-2 text-sm text-[color:var(--text-primary)]">
           已檢查 {visitedIds.length} / {hotspotCount} 項
         </p>
-      </div>
-
-      <div className="mb-4 flex flex-wrap items-center gap-2 text-sm">
-        <span className="text-[color:var(--text-muted)]">換一間房：</span>
-        {tourProfiles.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            aria-pressed={profileId === item.id}
-            onClick={() => changeProfile(item.id)}
-            className={`rounded-full border px-3 py-1.5 transition ${
-              profileId === item.id
-                ? "border-[color:var(--accent)]/50 bg-[color:var(--accent)]/8 text-[color:var(--text-primary)]"
-                : "border-white/10 text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]"
-            }`}
-          >
-            {item.title}
-          </button>
-        ))}
       </div>
 
       <div className="mb-6 inline-flex flex-wrap rounded-full border border-white/10 bg-black/30 p-1 text-sm">

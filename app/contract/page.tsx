@@ -22,7 +22,7 @@ export default async function ContractPage({ searchParams }: PageProps<"/contrac
 
       <ContractDemo key={initialCaseId ?? "default"} initialCaseId={initialCaseId} />
 
-      <section className="panel flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+      <section className="panel flex flex-col gap-4 !bg-[#2c2c2c] p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
         <h2 className="text-lg font-semibold text-[color:var(--text-primary)]">延伸資源</h2>
         <div className="flex flex-wrap gap-3">
           {resources.map((resource) => (

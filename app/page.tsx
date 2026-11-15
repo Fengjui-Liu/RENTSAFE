@@ -109,9 +109,6 @@ export default function Home() {
               <h1 className="page-title">
                 簽約前，查核房子與合約
               </h1>
-              <p className="max-w-2xl text-lg leading-8 text-[color:var(--text-secondary)]">
-                租金對照實價登錄，合約對照內政部範本。
-              </p>
             </div>
 
             <div className="flex flex-col gap-4 sm:flex-row">
@@ -123,14 +120,10 @@ export default function Home() {
               </Link>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid max-w-xs gap-4">
               <div className="metric-card">
                 <p className="text-sm text-[color:var(--text-secondary)]">查核模組</p>
                 <p className="mt-2 text-3xl font-semibold text-[color:var(--text-primary)]">4 大面向</p>
-              </div>
-              <div className="metric-card">
-                <p className="text-sm text-[color:var(--text-secondary)]">使用費用</p>
-                <p className="mt-2 text-3xl font-semibold text-[color:var(--text-primary)]">免費</p>
               </div>
             </div>
           </div>
@@ -141,7 +134,7 @@ export default function Home() {
 
       <section className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
         <div>
-          <p className="eyebrow">查核結果長這樣</p>
+          <p className="eyebrow">您的查核結果</p>
           <h2 className="mt-2 text-2xl font-semibold text-[color:var(--text-primary)]">每一項都標示風險程度與資料來源</h2>
           <p className="mt-3 text-sm leading-7 text-[color:var(--text-muted)]">
             右邊是示範案例的查核摘要。真實資料與示範資料會分開標示。
@@ -161,9 +154,6 @@ export default function Home() {
                     <span className="text-amber-200">需自行確認 {preview.counts.self} 項</span>
                   </>
                 )}
-              </p>
-              <p className="text-sm text-[color:var(--text-secondary)]">
-                來源：租金為內政部實價登錄（{preview.period}）；其餘為示範資料
               </p>
             </div>
 
@@ -196,7 +186,7 @@ export default function Home() {
       <section className="space-y-6">
         <div>
           <p className="eyebrow">核心功能</p>
-          <h2 className="mt-2 text-2xl font-semibold text-[color:var(--text-primary)]">把租屋風險拆成可判斷的訊號</h2>
+          <h2 className="mt-2 text-2xl font-semibold text-[color:var(--text-primary)]">RENTSAFE幫你把關</h2>
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">

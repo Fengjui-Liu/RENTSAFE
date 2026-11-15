@@ -242,31 +242,93 @@ export function getTourScenes(profileId: TourProfileId): TourScene[] {
   );
 }
 
-// ── 壓力情境（與房東談）：不計分、沒有標準答案，只標示「比較穩妥／比較冒險」
-export const pressureScenario = {
-  title: "情境：房東催你今天簽",
-  line: "房東說：「很多人在看，你今天不簽，明天就沒了。」",
-  options: [
-    {
-      id: "sign-now",
-      text: "好，那我現在就簽",
-      tone: "比較冒險",
-      reaction: "房東很快拿出合約。但你還沒看完合約條款和現況確認書，簽名後想改就不容易。",
-      script: null as string | null,
-    },
-    {
-      id: "take-home",
-      text: "我想先帶回去看，再回覆您",
-      tone: "比較穩妥",
-      reaction: "房東可能會再催一次，這時可以平靜地再說一次。範本載明審閱期至少三日，合理的審閱時間本來就是你的權利。",
-      script: "我很有興趣，但合約和現況確認書我想帶回去仔細看，確定後再給您答覆，可以嗎？",
-    },
-    {
-      id: "deposit",
-      text: "那我先付訂金，把房子留著",
-      tone: "比較冒險",
-      reaction: "房東可能答應。但訂金退不退、什麼條件退，如果沒有寫清楚，之後很容易起爭議。",
-      script: "如果要先付訂金，請先用書面寫明金額，以及哪些情況下會全額退還，雙方簽名再付款。",
-    },
-  ],
-};
+// ── 壓力情境（與房東談）：三題，不計分、沒有標準答案，只標示「比較穩妥／比較冒險」
+export type PressureOption = { id: string; text: string; tone: "比較穩妥" | "比較冒險"; reaction: string; script: string | null };
+export type PressureQuestion = { id: string; title: string; line: string; options: PressureOption[] };
+
+export const pressureQuestions: PressureQuestion[] = [
+  {
+    id: "rush",
+    title: "房東催你今天簽",
+    line: "房東說：「很多人在看，你今天不簽，明天就沒了。」",
+    options: [
+      {
+        id: "sign-now",
+        text: "好，那我現在就簽",
+        tone: "比較冒險",
+        reaction: "房東很快拿出合約。但你還沒看完合約條款和現況確認書，簽名後想改就不容易。",
+        script: null,
+      },
+      {
+        id: "skim",
+        text: "我現場快速翻一下，沒問題就簽",
+        tone: "比較冒險",
+        reaction: "現場很難逐條看完，又有人在旁邊等，容易漏掉押金、修繕、提前終止這類條款。",
+        script: null,
+      },
+      {
+        id: "take-home",
+        text: "我想先帶回去看，再回覆您",
+        tone: "比較穩妥",
+        reaction: "房東可能會再催一次，這時可以平靜地再說一次。範本載明審閱期至少三日，合理的審閱時間本來就是你的權利。",
+        script: "我很有興趣，但合約和現況確認書我想帶回去仔細看，確定後再給您答覆，可以嗎？",
+      },
+    ],
+  },
+  {
+    id: "deposit",
+    title: "房東要你先轉訂金",
+    line: "房東說：「這間很搶手，你先轉訂金，我才幫你保留。」",
+    options: [
+      {
+        id: "pay-now",
+        text: "好，我現在就轉",
+        tone: "比較冒險",
+        reaction: "沒有書面寫明金額和退還條件，之後退不退、退多少，很容易起爭議。",
+        script: null,
+      },
+      {
+        id: "written",
+        text: "請先寫明金額和退還條件，雙方簽名再付",
+        tone: "比較穩妥",
+        reaction: "房東可能覺得麻煩，但書面條件正是保護雙方。願意簽的房東，之後也比較好溝通。",
+        script: "如果要先付訂金，請先用書面寫明金額，以及哪些情況下會全額退還，雙方簽名再付款。",
+      },
+      {
+        id: "no-deposit",
+        text: "我先不付，等看完合約再決定",
+        tone: "比較穩妥",
+        reaction: "房東可能說會先租給別人。這是正常的取捨：錯過一間房，通常比簽到有問題的合約容易補救。",
+        script: "我想先看完合約和現況確認書再決定，如果您先租給別人，我也能理解。",
+      },
+    ],
+  },
+  {
+    id: "verbal",
+    title: "房東說小事不用寫進合約",
+    line: "房東說：「冷氣壞了我會修，這種小事不用寫進合約啦。」",
+    options: [
+      {
+        id: "trust",
+        text: "好，相信您",
+        tone: "比較冒險",
+        reaction: "口頭承諾事後很難舉證。真的壞了，誰負責、多久修，可能各說各話。",
+        script: null,
+      },
+      {
+        id: "write-in",
+        text: "請寫進合約或附件，我比較放心",
+        tone: "比較穩妥",
+        reaction: "範本預設由出租人負責修繕，寫進去只是把原本的約定寫清楚，房東通常不好拒絕。",
+        script: "冷氣和其他附屬設備的修繕責任，可以請您寫進合約或附屬設備清單嗎？這樣我們雙方都有依據。",
+      },
+      {
+        id: "photo",
+        text: "先拍照存證設備現況，再簽約",
+        tone: "比較穩妥",
+        reaction: "拍照能證明簽約時的狀態，之後處理損壞責任時有依據。建議搭配附屬設備清單一起留存。",
+        script: null,
+      },
+    ],
+  },
+];

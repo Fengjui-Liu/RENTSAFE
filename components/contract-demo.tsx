@@ -352,7 +352,7 @@ export function ContractDemo({ initialCaseId }: { initialCaseId?: string }) {
 
           <button
             type="button"
-            className="button-secondary mt-4 w-full justify-center disabled:cursor-wait disabled:opacity-60"
+            className="button-primary mt-4 w-full justify-center disabled:cursor-wait disabled:opacity-60"
             onClick={() => runTextCheck(contractText)}
             disabled={isLoading}
           >

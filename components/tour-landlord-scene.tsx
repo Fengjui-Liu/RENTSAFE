@@ -1,7 +1,7 @@
 "use client";
 
 import { ContactShadows, RoundedBox } from "@react-three/drei";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 import type { Group } from "three";
 
@@ -18,6 +18,18 @@ function useReducedMotion() {
   }, []);
 
   return reducedMotion;
+}
+
+function FixedCamera() {
+  const { camera } = useThree();
+
+  useEffect(() => {
+    // 視線往上抬，場景整體往畫面下方移，避免偏上、下方留白
+    camera.lookAt(0, 1.9, 0);
+    camera.updateProjectionMatrix();
+  }, [camera]);
+
+  return null;
 }
 
 function Room() {
@@ -211,6 +223,7 @@ function LandlordRoom() {
       <ambientLight intensity={1.4} />
       <directionalLight castShadow intensity={2.1} position={[4, 8, 6]} shadow-mapSize-width={1024} shadow-mapSize-height={1024} />
       <hemisphereLight args={["#fff2dc", "#79543c", 1.05]} />
+      <FixedCamera />
       <Room />
       <MeetingTable />
       <Person position={[-1.55, 0.02, 1.1]} rotationY={-0.28} shirt="#3b82f6" trousers="#53657b" hair="#493126" phase={0} reducedMotion={reducedMotion} />
