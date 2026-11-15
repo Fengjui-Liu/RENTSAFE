@@ -162,7 +162,7 @@ export const mockContractResult = {
 
 export const featureCards = [
   {
-    title: "建案合法性",
+    title: "建物合法性",
     description: "列出坪數、增建、隔間的現況確認重點，提醒你向房東確認（示範資料）",
     href: "/check",
   },

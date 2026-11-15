@@ -306,8 +306,8 @@ export function ContractDemo({ initialCaseId }: { initialCaseId?: string }) {
             </span>
             <span className="text-lg font-semibold text-[color:var(--text-primary)]">拖曳或點擊選擇合約 PDF</span>
             <span className="mt-3 flex flex-wrap justify-center gap-2 text-[15px] text-[color:var(--text-secondary)]">
-              <span className="rounded-full border border-white/10 bg-black/30 px-3 py-1">瀏覽器內解析，不上傳</span>
-              <span className="rounded-full border border-white/10 bg-black/30 px-3 py-1">需有文字層</span>
+              <span className="rounded-full border border-white/10 bg-black/30 px-3 py-1">🔒 瀏覽器內解析，檔案不上傳</span>
+              <span className="rounded-full border border-white/10 bg-black/30 px-3 py-1">掃描檔或拍照 PDF 可能讀不到，請改貼上文字</span>
             </span>
             <input
               type="file"

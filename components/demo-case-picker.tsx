@@ -43,6 +43,14 @@ export function DemoCasePicker({ cases, selectedId, onLoad, onReset }: DemoCaseP
       >
         重置
       </button>
+      {selectedId ? (
+        <p
+          role="status"
+          className="basis-full rounded-2xl border border-amber-300/30 bg-amber-300/10 px-4 py-2 text-[15px] text-amber-100"
+        >
+          目前顯示的是示範資料，不是你自己的房源或合約。改成自己的輸入後，此提示會消失。
+        </p>
+      ) : null}
     </section>
   );
 }

@@ -179,11 +179,11 @@ body {
 
 @media (min-width: 640px) {
   .tour-hotspot-dialog {
-    top: min(calc(var(--hotspot-y) - 3rem), 45%);
+    top: 0.75rem;
     right: auto;
     bottom: auto;
-    left: min(calc(var(--hotspot-x) + 3.5rem), calc(100% - min(20rem, 46%) - 1.25rem));
-    width: min(20rem, 46%);
+    left: min(calc(var(--hotspot-x) + 3.5rem), calc(100% - min(22rem, 48%) - 1.25rem));
+    width: min(22rem, 48%);
   }
 }
 

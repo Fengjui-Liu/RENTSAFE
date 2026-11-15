@@ -527,7 +527,7 @@ export function CheckDemo({
               </h3>
 
               <SelectField
-                label="行政區"
+                label="行政區（目前僅支援台北市）"
                 value={district}
                 options={DISTRICTS}
                 onChange={(value) => {

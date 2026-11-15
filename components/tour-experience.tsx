@@ -2,9 +2,17 @@
 
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { Component, useState, useSyncExternalStore } from "react";
+import { Component, useEffect, useState, useSyncExternalStore } from "react";
 import type { CSSProperties, ReactNode } from "react";
-import { tourHotspotCount, tourHouse, tourScenes, type TourScene } from "@/data/tour-data";
+import {
+  getTourScenes,
+  pressureScenario,
+  tourHouse,
+  tourProfiles,
+  type TourHotspot,
+  type TourProfileId,
+  type TourScene,
+} from "@/data/tour-data";
 
 const TourViewingScene = dynamic(() => import("@/components/tour-viewing-scene"), {
   ssr: false,
@@ -72,24 +80,248 @@ function SceneIllustration({ sceneId, onContextLost }: { sceneId: TourScene["id"
   return <TourSigningScene onContextLost={onContextLost} />;
 }
 
+type Guess = "yes" | "no" | "unsure" | "skip";
+
+const guessOptions: { id: Exclude<Guess, "skip">; label: string }[] = [
+  { id: "yes", label: "有問題" },
+  { id: "no", label: "沒問題" },
+  { id: "unsure", label: "不確定" },
+];
+
+// 不計分，回饋只描述「這個細節」本身
+function guessFeedback(hotspot: TourHotspot, guess: Guess) {
+  if (guess === "skip") return null;
+  if (hotspot.kind === "risk") {
+    return guess === "yes" ? "你有注意到這一點，現場照這樣問就好。" : "這個細節容易被忽略，現場記得問一下。";
+  }
+  return guess === "yes"
+    ? "這裡其實是正常的。能分辨正常與可疑，也是看房的功課。"
+    : "判斷沒錯，這裡看起來是正常的。";
+}
+
+function CopyButton({ text, label = "複製" }: { text: string; label?: string }) {
+  const [done, setDone] = useState(false);
+  return (
+    <button
+      type="button"
+      className="rounded-full border border-white/15 px-3 py-1 text-xs text-[color:var(--text-secondary)] transition hover:bg-white/10 hover:text-white"
+      onClick={async () => {
+        try {
+          await navigator.clipboard.writeText(text);
+          setDone(true);
+          setTimeout(() => setDone(false), 1500);
+        } catch {
+          setDone(false);
+        }
+      }}
+    >
+      {done ? "已複製" : label}
+    </button>
+  );
+}
+
+function HotspotDetail({
+  hotspot,
+  guess,
+  onGuess,
+}: {
+  hotspot: TourHotspot;
+  guess: Guess | undefined;
+  onGuess: (guess: Guess) => void;
+}) {
+  if (!guess) {
+    return (
+      <div className="mt-3 space-y-3">
+        <p className="text-sm leading-7 text-[color:var(--text-primary)]">先猜猜看：你覺得這裡有問題嗎？</p>
+        <div className="flex flex-wrap gap-2">
+          {guessOptions.map((option) => (
+            <button
+              key={option.id}
+              type="button"
+              onClick={() => onGuess(option.id)}
+              className="rounded-full border border-white/20 bg-white/5 px-4 py-1.5 text-sm text-[color:var(--text-primary)] transition hover:border-[color:var(--primary)]/50 hover:bg-[color:var(--primary)]/10"
+            >
+              {option.label}
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={() => onGuess("skip")}
+            className="rounded-full px-3 py-1.5 text-xs text-[color:var(--text-muted)] underline-offset-2 hover:underline"
+          >
+            直接看答案
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const feedback = guessFeedback(hotspot, guess);
+  const isRisk = hotspot.kind === "risk";
+
+  return (
+    <div className="mt-3 space-y-3">
+      {feedback ? <p className="text-xs text-[color:var(--primary-soft)]">{feedback}</p> : null}
+      <div>
+        <p className="text-xs font-semibold text-[color:var(--text-muted)]">你看到的</p>
+        <p className="mt-1 text-sm leading-7 text-[color:var(--text-primary)]">{hotspot.see}</p>
+      </div>
+      <div>
+        <p className="text-xs font-semibold text-[color:var(--text-muted)]">
+          {isRisk ? "為什麼要注意" : "為什麼不用擔心"}
+        </p>
+        <p className="mt-1 text-sm leading-7 text-[color:var(--text-primary)]">{hotspot.attention}</p>
+      </div>
+      <div className="rounded-2xl border border-[color:var(--primary)]/20 bg-[color:var(--primary)]/8 px-4 py-3">
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-xs font-semibold text-[color:var(--primary-soft)]">現場怎麼問</p>
+          <CopyButton text={hotspot.ask} />
+        </div>
+        <p className="mt-1 text-sm leading-7 text-[color:var(--text-primary)]">{hotspot.ask}</p>
+        <p className="mt-2 text-xs leading-6 text-[color:var(--text-secondary)]">依據：{hotspot.basis}</p>
+      </div>
+    </div>
+  );
+}
+
+function PressurePanel() {
+  const [chosen, setChosen] = useState<string | null>(null);
+  const option = pressureScenario.options.find((item) => item.id === chosen) ?? null;
+
+  return (
+    <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
+      <p className="eyebrow text-xs">{pressureScenario.title}</p>
+      <p className="mt-2 text-base font-semibold text-[color:var(--text-primary)]">{pressureScenario.line}</p>
+      <p className="mt-1 text-xs text-[color:var(--text-muted)]">你會怎麼回？沒有標準答案，不計分。</p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {pressureScenario.options.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            aria-pressed={chosen === item.id}
+            onClick={() => setChosen(item.id)}
+            className={`rounded-full border px-4 py-2 text-sm transition ${
+              chosen === item.id
+                ? "border-[color:var(--primary)] bg-[color:var(--primary)]/15 text-[color:var(--text-primary)]"
+                : "border-white/15 text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]"
+            }`}
+          >
+            {item.text}
+          </button>
+        ))}
+      </div>
+      {option ? (
+        <div className="mt-4 space-y-2 rounded-2xl border border-white/10 bg-black/20 p-4">
+          <p className="text-xs font-semibold text-[color:var(--primary-soft)]">{option.tone}</p>
+          <p className="text-sm leading-7 text-[color:var(--text-primary)]">房東可能的反應：{option.reaction}</p>
+          {option.script ? (
+            <div className="flex items-start justify-between gap-3 rounded-xl bg-white/5 px-3 py-2">
+              <p className="text-sm leading-7 text-[color:var(--text-primary)]">可以這樣說：{option.script}</p>
+              <CopyButton text={option.script} />
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number) {
+  const lines: string[] = [];
+  let line = "";
+  for (const char of text) {
+    if (ctx.measureText(line + char).width > maxWidth) {
+      lines.push(line);
+      line = char;
+    } else {
+      line += char;
+    }
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+
+function downloadChecklistImage(items: { where: string; ask: string }[]) {
+  const width = 1080;
+  const pad = 56;
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  const font = '"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif';
+
+  ctx.font = `28px ${font}`;
+  const blocks = items.map((item) => ({ where: item.where, lines: wrapText(ctx, item.ask, width - pad * 2 - 40) }));
+  const height = 190 + blocks.reduce((sum, block) => sum + 44 + block.lines.length * 40 + 28, 0) + 70;
+
+  canvas.width = width;
+  canvas.height = height;
+  ctx.fillStyle = "#121827";
+  ctx.fillRect(0, 0, width, height);
+  ctx.fillStyle = "#f8fafc";
+  ctx.font = `bold 44px ${font}`;
+  ctx.fillText("我的看房提問清單", pad, 88);
+  ctx.fillStyle = "#94a3b8";
+  ctx.font = `24px ${font}`;
+  ctx.fillText("RentSafe 賃居守護・情境看房（示範房源）", pad, 130);
+
+  let y = 190;
+  for (const block of blocks) {
+    ctx.fillStyle = "#fb923c";
+    ctx.font = `bold 28px ${font}`;
+    ctx.fillText(`☐ ${block.where}`, pad, y);
+    y += 44;
+    ctx.fillStyle = "#e2e8f0";
+    ctx.font = `28px ${font}`;
+    for (const line of block.lines) {
+      ctx.fillText(line, pad + 40, y);
+      y += 40;
+    }
+    y += 28;
+  }
+  ctx.fillStyle = "#64748b";
+  ctx.font = `22px ${font}`;
+  ctx.fillText("提問依據：內政部住宅租賃契約書範本附件一「租賃標的現況確認書」", pad, height - 30);
+
+  const link = document.createElement("a");
+  link.download = "我的看房提問清單.png";
+  link.href = canvas.toDataURL("image/png");
+  link.click();
+}
+
 export function TourExperience() {
+  const [profileId, setProfileId] = useState<TourProfileId>("rooftop");
   const [sceneIndex, setSceneIndex] = useState(0);
   const [activeHotspotId, setActiveHotspotId] = useState<string | null>(null);
-  const [visitedIds, setVisitedIds] = useState<string[]>([]);
+  const [guesses, setGuesses] = useState<Record<string, Guess>>({});
   const [showSummary, setShowSummary] = useState(false);
   const [webglFailed, setWebglFailed] = useState(false);
   const webglSupported = useWebGLSupport();
   const listMode = !webglSupported || webglFailed;
   const switchToListMode = () => setWebglFailed(true);
 
-  const scene = tourScenes[sceneIndex];
-  const activeHotspot = scene.hotspots.find((hotspot) => hotspot.id === activeHotspotId) ?? null;
-  const isLastScene = sceneIndex === tourScenes.length - 1;
+  const scenes = getTourScenes(profileId);
+  const profile = tourProfiles.find((item) => item.id === profileId) ?? tourProfiles[0];
+  const hotspotCount = scenes.reduce((total, item) => total + item.hotspots.length, 0);
+  // 回答（或選擇直接看答案）之後才算「已檢查」
+  const visitedIds = Object.keys(guesses);
 
-  const openHotspot = (id: string) => {
-    setActiveHotspotId(id);
-    setVisitedIds((current) => (current.includes(id) ? current : [...current, id]));
-  };
+  const scene = scenes[sceneIndex];
+  const activeHotspot = scene.hotspots.find((hotspot) => hotspot.id === activeHotspotId) ?? null;
+  const isLastScene = sceneIndex === scenes.length - 1;
+  const hasUnvisited = scene.hotspots.some((hotspot) => !visitedIds.includes(hotspot.id));
+
+  // 閒置提示：5 秒沒操作，尚未檢查的標記微微閃動。以「操作簽章」比對，操作一變動提示就自動消失
+  const activitySig = `${profileId}|${sceneIndex}|${activeHotspotId}|${visitedIds.length}|${showSummary}`;
+  const [hintSig, setHintSig] = useState("");
+  const hintOn = hintSig === activitySig && hasUnvisited && !showSummary;
+  useEffect(() => {
+    if (showSummary || !hasUnvisited) return;
+    const timer = setTimeout(() => setHintSig(activitySig), 5000);
+    return () => clearTimeout(timer);
+  }, [activitySig, showSummary, hasUnvisited]);
+
+  const openHotspot = (id: string) => setActiveHotspotId(id);
+  const guess = (id: string, value: Guess) => setGuesses((current) => ({ ...current, [id]: value }));
 
   const goToScene = (index: number) => {
     setSceneIndex(index);
@@ -100,9 +332,21 @@ export function TourExperience() {
   const restart = () => {
     setSceneIndex(0);
     setActiveHotspotId(null);
-    setVisitedIds([]);
+    setGuesses({});
     setShowSummary(false);
   };
+
+  const changeProfile = (id: TourProfileId) => {
+    setProfileId(id);
+    restart();
+  };
+
+  const checklist = scenes.flatMap((item) =>
+    item.hotspots
+      .filter((hotspot) => hotspot.kind === "risk" && visitedIds.includes(hotspot.id))
+      .map((hotspot) => ({ where: `${item.title}・${hotspot.label}`, ask: hotspot.ask })),
+  );
+  const checklistText = checklist.map((item, index) => `${index + 1}. [${item.where}] ${item.ask}`).join("\n");
 
   return (
     <section className="panel p-6 sm:p-8">
@@ -110,19 +354,40 @@ export function TourExperience() {
         <div>
           <div className="flex items-center gap-2">
             <span className="inline-flex rounded-full border border-white/10 bg-black/30 px-2 py-1 text-xs text-[color:var(--text-muted)]">
-              情境示範
+              情境示範・虛構房源
             </span>
           </div>
-          <h2 className="mt-3 text-2xl font-semibold text-[color:var(--text-primary)]">{tourHouse.title}</h2>
-          <p className="mt-2 text-sm text-[color:var(--text-secondary)]">{tourHouse.description}</p>
+          <h2 className="mt-3 text-2xl font-semibold text-[color:var(--text-primary)]">{profile.title}</h2>
+          <p className="mt-2 text-sm text-[color:var(--text-secondary)]">
+            {profileId === "rooftop" ? tourHouse.description : profile.note}
+          </p>
         </div>
         <p className="rounded-full border border-[color:var(--primary)]/30 bg-[color:var(--primary)]/8 px-4 py-2 text-sm text-[color:var(--text-primary)]">
-          已檢查 {visitedIds.length} / {tourHotspotCount} 項
+          已檢查 {visitedIds.length} / {hotspotCount} 項
         </p>
       </div>
 
+      <div className="mb-4 flex flex-wrap items-center gap-2 text-sm">
+        <span className="text-[color:var(--text-muted)]">換一間房：</span>
+        {tourProfiles.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            aria-pressed={profileId === item.id}
+            onClick={() => changeProfile(item.id)}
+            className={`rounded-full border px-3 py-1.5 transition ${
+              profileId === item.id
+                ? "border-[color:var(--primary)]/50 bg-[color:var(--primary)]/8 text-[color:var(--text-primary)]"
+                : "border-white/10 text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]"
+            }`}
+          >
+            {item.title}
+          </button>
+        ))}
+      </div>
+
       <div className="mb-6 inline-flex flex-wrap rounded-full border border-white/10 bg-black/30 p-1 text-sm">
-        {tourScenes.map((item, index) => (
+        {scenes.map((item, index) => (
           <button
             key={item.id}
             type="button"
@@ -141,6 +406,47 @@ export function TourExperience() {
 
       {showSummary ? (
         <div className="space-y-6">
+          <div className="rounded-3xl border border-[color:var(--primary)]/30 bg-[color:var(--primary)]/5 p-5">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h3 className="text-lg font-semibold text-[color:var(--text-primary)]">我的看房提問清單</h3>
+              {checklist.length > 0 ? (
+                <div className="flex gap-2">
+                  <CopyButton text={checklistText} label="複製清單" />
+                  <button
+                    type="button"
+                    className="rounded-full border border-white/15 px-3 py-1 text-xs text-[color:var(--text-secondary)] transition hover:bg-white/10 hover:text-white"
+                    onClick={() => downloadChecklistImage(checklist)}
+                  >
+                    存成圖片
+                  </button>
+                </div>
+              ) : null}
+            </div>
+            {checklist.length > 0 ? (
+              <ol className="mt-3 space-y-3 text-sm leading-7 text-[color:var(--text-primary)]">
+                {checklist.map((item) => (
+                  <li key={item.where}>
+                    <span className="font-semibold text-[color:var(--primary-soft)]">{item.where}</span>
+                    <br />
+                    {item.ask}
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <p className="mt-3 text-sm text-[color:var(--text-secondary)]">
+                {visitedIds.length === 0
+                  ? "你還沒檢查任何標記。回去點幾個，這裡就會長出一份可以帶去看房的清單。"
+                  : "這間房你檢查過的項目都是正常現象，沒有需要追問的地方。"}
+              </p>
+            )}
+          </div>
+
+          {profile.checkNote ? (
+            <p className="rounded-2xl border border-amber-300/30 bg-amber-300/10 px-4 py-3 text-sm leading-7 text-amber-100">
+              {profile.checkNote}
+            </p>
+          ) : null}
+
           <div className="grid gap-4 sm:grid-cols-2">
             {[
               { title: "你看過的", visited: true },
@@ -149,7 +455,7 @@ export function TourExperience() {
               <div key={group.title} className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
                 <h3 className="text-lg font-semibold text-[color:var(--text-primary)]">{group.title}</h3>
                 <ul className="mt-3 space-y-2 text-sm leading-7 text-[color:var(--text-secondary)]">
-                  {tourScenes.flatMap((item) =>
+                  {scenes.flatMap((item) =>
                     item.hotspots
                       .filter((hotspot) => visitedIds.includes(hotspot.id) === group.visited)
                       .map((hotspot) => (
@@ -163,12 +469,15 @@ export function TourExperience() {
             ))}
           </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Link href={tourHouse.checkHref} className="button-primary justify-center">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <Link href="/contract" className="button-primary justify-center">
+              拿你的真實合約來比對
+            </Link>
+            <Link href={tourHouse.checkHref} className="button-secondary justify-center">
               帶著這間房去查核
             </Link>
             <Link href={tourHouse.contractHref} className="button-secondary justify-center">
-              檢查這份合約
+              先看示範合約結果
             </Link>
             <button type="button" className="button-secondary justify-center" onClick={restart}>
               重新開始
@@ -196,7 +505,7 @@ export function TourExperience() {
                           active
                             ? "border-[color:var(--primary)]/50 bg-[color:var(--primary)]/8"
                             : "border-white/10 bg-white/[0.03]"
-                        }`}
+                        } ${hintOn && !visited && !active ? "motion-safe:animate-pulse" : ""}`}
                       >
                         <button
                           type="button"
@@ -221,11 +530,11 @@ export function TourExperience() {
                         </button>
                         {active ? (
                           <div id={`tour-hotspot-panel-${hotspot.id}`} className="px-4 pb-4">
-                            <p className="text-sm leading-7 text-[color:var(--text-primary)]">{hotspot.attention}</p>
-                            <div className="mt-3 rounded-2xl border border-[color:var(--primary)]/20 bg-[color:var(--primary)]/8 px-4 py-3">
-                              <p className="text-xs font-semibold text-[color:var(--primary-soft)]">法規依據</p>
-                              <p className="mt-1 text-xs leading-6 text-[color:var(--text-secondary)]">{hotspot.basis}</p>
-                            </div>
+                            <HotspotDetail
+                              hotspot={hotspot}
+                              guess={guesses[hotspot.id]}
+                              onGuess={(value) => guess(hotspot.id, value)}
+                            />
                           </div>
                         ) : null}
                       </li>
@@ -257,7 +566,7 @@ export function TourExperience() {
                           : visited
                             ? "border-[color:var(--primary)]/40 bg-black/70 text-[color:var(--primary-soft)]"
                             : "border-white/20 bg-black/70 text-[color:var(--text-primary)]"
-                      }`}
+                      } ${hintOn && !visited && !active ? "motion-safe:animate-pulse ring-2 ring-[color:var(--primary)]/60" : ""}`}
                     >
                       <span>{visited ? "✓" : index + 1}</span>
                       <span>{hotspot.label}</span>
@@ -277,7 +586,7 @@ export function TourExperience() {
                         "--hotspot-y": `${activeHotspot.y}%`,
                       } as CSSProperties
                     }
-                    className="tour-hotspot-dialog absolute z-20 max-h-[72%] overflow-y-auto rounded-2xl border border-white/15 bg-[#121827]/95 p-4 shadow-2xl backdrop-blur-md sm:rounded-3xl sm:p-5"
+                    className="tour-hotspot-dialog absolute z-20 max-h-[calc(100%-1.5rem)] overflow-y-auto rounded-2xl border border-white/15 bg-[#121827]/95 p-4 shadow-2xl backdrop-blur-md sm:rounded-3xl sm:p-5"
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div>
@@ -295,11 +604,11 @@ export function TourExperience() {
                         ×
                       </button>
                     </div>
-                    <p className="mt-3 text-sm leading-7 text-[color:var(--text-primary)]">{activeHotspot.attention}</p>
-                    <div className="mt-4 rounded-2xl border border-[color:var(--primary)]/20 bg-[color:var(--primary)]/8 px-4 py-3">
-                      <p className="text-xs font-semibold text-[color:var(--primary-soft)]">法規依據</p>
-                      <p className="mt-1 text-xs leading-6 text-[color:var(--text-secondary)]">{activeHotspot.basis}</p>
-                    </div>
+                    <HotspotDetail
+                      hotspot={activeHotspot}
+                      guess={guesses[activeHotspot.id]}
+                      onGuess={(value) => guess(activeHotspot.id, value)}
+                    />
                   </div>
                 ) : (
                   <p className="absolute bottom-3 left-3 z-10 rounded-full border border-white/15 bg-black/70 px-3 py-2 text-xs text-[color:var(--text-primary)] backdrop-blur-sm sm:bottom-5 sm:left-5 sm:text-sm">
@@ -310,13 +619,15 @@ export function TourExperience() {
             )}
           </div>
 
+          {scene.id === "landlord" ? <PressurePanel /> : null}
+
           <div className="flex justify-end">
             <button
               type="button"
               className="button-secondary min-w-52 justify-center"
               onClick={() => (isLastScene ? setShowSummary(true) : goToScene(sceneIndex + 1))}
             >
-              {isLastScene ? "查看總結" : `下一站：${tourScenes[sceneIndex + 1].title}`}
+              {isLastScene ? "查看總結與提問清單" : `下一站：${scenes[sceneIndex + 1].title}`}
             </button>
           </div>
         </div>

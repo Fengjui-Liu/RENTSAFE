@@ -9,7 +9,7 @@ export type ContractSample = {
 export const contractSamples: readonly ContractSample[] = [
   {
     id: "text-common-risks",
-    title: "示範合約文字 A：常見爭議條款",
+    title: "常見爭議條款（示範）",
     description: "押金、修繕、戶籍、補貼、終止、轉租",
     text: [
       "第三條 承租人應繳納三個月押金，作為履約擔保。",
@@ -21,7 +21,7 @@ export const contractSamples: readonly ContractSample[] = [
   },
   {
     id: "text-invalid-clauses",
-    title: "示範合約文字 B：範本明載無效的條款",
+    title: "範本明載無效的條款（示範）",
     description: "廣告、審閱期、稅賦、繳回契約書、通知方式等",
     text: [
       "第一條 本物件廣告內容僅供參考。",
@@ -36,7 +36,7 @@ export const contractSamples: readonly ContractSample[] = [
   },
   {
     id: "text-template-like",
-    title: "示範合約文字 C：貼近範本的條款",
+    title: "貼近範本的條款（示範）",
     description: "規則沒有命中，用來說明「沒命中不等於沒問題」",
     text: [
       "第三條 押金為二個月租金總額。",

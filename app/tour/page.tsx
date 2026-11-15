@@ -6,7 +6,7 @@ export default function TourPage() {
       <section className="space-y-4">
         <h1 className="text-4xl font-semibold leading-tight text-[color:var(--text-primary)]">情境看房</h1>
         <p className="max-w-3xl text-base leading-8 text-[color:var(--text-secondary)]">
-          點開標記，看簽約前要確認什麼。不計分
+          點開標記，先猜再看答案。沒有分數，只有一份你可以帶去看房的清單。
         </p>
       </section>
 
