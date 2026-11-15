@@ -371,7 +371,7 @@ export function TourExperience() {
     <section className="panel p-6 sm:p-8">
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold text-[color:var(--text-primary)]">{profile.title}（示範）</h2>
+          <h2 className="text-2xl font-semibold text-[color:var(--text-primary)]">{profile.title}</h2>
           <p className="mt-2 text-sm text-[color:var(--text-secondary)]">
             {tourHouse.description}
           </p>
