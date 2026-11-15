@@ -12,7 +12,7 @@ const sources = [
 export default function AboutPage() {
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
-      <h1 className="text-4xl font-semibold leading-tight text-[color:var(--text-primary)]">關於 RentSafe</h1>
+      <h1 className="page-title">關於 RentSafe</h1>
 
       <section className="panel grid gap-10 p-8 lg:grid-cols-3">
         <div>

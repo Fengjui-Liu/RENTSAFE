@@ -455,7 +455,7 @@ export function CheckDemo({
   return (
     <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
       {/* 左側：輸入區域 */}
-      <div className="space-y-6">
+      <div className="min-w-0 space-y-6">
         <section className="panel p-6 sm:p-8">
           <div className="mb-6">
             <h2 className="text-2xl font-semibold text-[color:var(--text-primary)]">
@@ -475,7 +475,7 @@ export function CheckDemo({
                 }}
                 className={`rounded-2xl border p-3 text-sm ${
                   inputMethod === "upload"
-                    ? "border-orange-500 bg-orange-500/10 text-orange-300"
+                    ? "border-[color:var(--accent)]/60 bg-[color:var(--accent)]/10 text-[color:var(--accent)]"
                     : "border-white/10 text-gray-300"
                 }`}
               >
@@ -492,7 +492,7 @@ export function CheckDemo({
                 }}
                 className={`rounded-2xl border p-3 text-sm ${
                   inputMethod === "manual"
-                    ? "border-orange-500 bg-orange-500/10 text-orange-300"
+                    ? "border-[color:var(--accent)]/60 bg-[color:var(--accent)]/10 text-[color:var(--accent)]"
                     : "border-white/10 text-gray-300"
                 }`}
               >
@@ -563,7 +563,7 @@ export function CheckDemo({
                     setResult(null);
                   }}
                   placeholder="例如 12000"
-                  className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-sm text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-muted)] focus:border-[color:var(--primary)]/40"
+                  className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-sm text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-muted)] focus:border-[color:var(--accent)]/40"
                 />
               </label>
 
@@ -665,7 +665,7 @@ function SelectField({
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-sm text-[color:var(--text-primary)] outline-none focus:border-[color:var(--primary)]/40"
+        className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-sm text-[color:var(--text-primary)] outline-none focus:border-[color:var(--accent)]/40"
       >
         {options.map((item) => (
           <option key={item} value={item}>
@@ -678,11 +678,32 @@ function SelectField({
 }
 
 function EmptyResult() {
+  const items = [
+    { title: "租金對照", detail: "與同行政區、同類型的實價登錄租金中位數比較，並標示樣本數與期間" },
+    { title: "現況確認重點", detail: "列出簽約前要請房東在現況確認書上填寫的項目" },
+    { title: "凶宅提醒", detail: "無法以官方資料查證，提醒你請房東填寫現況確認書第 8 項" },
+  ];
+
   return (
-    <div className="flex min-h-96 flex-col justify-between gap-8">
-      <h3 className="text-2xl font-semibold text-[color:var(--text-primary)]">
-        結果預覽
-      </h3>
+    <div className="flex min-h-96 flex-col gap-6">
+      <div>
+        <h3 className="text-2xl font-semibold text-[color:var(--text-primary)]">結果預覽</h3>
+        <p className="mt-2 text-sm text-[color:var(--text-muted)]">填好資料並送出後，這裡會顯示：</p>
+      </div>
+      <ol className="space-y-3">
+        {items.map((item, index) => (
+          <li key={item.title} className="flex gap-4 rounded-2xl border border-dashed border-white/12 p-4">
+            <span className="grid size-8 shrink-0 place-items-center rounded-full border border-white/15 text-sm font-semibold text-[color:var(--accent)]">
+              {index + 1}
+            </span>
+            <div>
+              <p className="font-semibold text-[color:var(--text-primary)]">{item.title}</p>
+              <p className="mt-1 text-sm leading-7 text-[color:var(--text-secondary)]">{item.detail}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+      <p className="text-sm text-[color:var(--text-muted)]">不想自己填？「展示模式」可以直接載入示範案例。</p>
     </div>
   );
 }

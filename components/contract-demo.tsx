@@ -45,8 +45,6 @@ type DisplayClause = {
 const RULES_DISCLAIMER = "關鍵字比對可能誤判或漏判；沒有命中不代表合約沒有問題";
 const BASIS_PAGE_NOTE = "頁碼依內政部 113 年 7 月 8 日修正版 23 頁 PDF；各單位轉載版頁碼可能不同，以條號為準";
 
-const highRiskCount = mockContractResult.clauses.filter((clause) => clause.risk === "high").length;
-const mediumRiskCount = mockContractResult.clauses.filter((clause) => clause.risk === "medium").length;
 
 function TextLines({ lines }: { lines: NormalizedLine[] }) {
   return (
@@ -72,12 +70,12 @@ function PdfSteps({ loading }: { loading: Extract<Loading, { kind: "pdf" }> }) {
             key={step}
             className={`flex items-center gap-3 rounded-2xl border px-4 py-3 text-sm transition ${
               active || done
-                ? "border-[color:var(--primary)]/20 bg-[color:var(--primary)]/8 text-[color:var(--text-primary)]"
+                ? "border-[color:var(--accent)]/20 bg-[color:var(--accent)]/8 text-[color:var(--text-primary)]"
                 : "border-white/8 bg-white/[0.02] text-[color:var(--text-muted)]"
             }`}
           >
             <span
-              className={`inline-flex h-2.5 w-2.5 rounded-full ${done ? "bg-[color:var(--primary)]" : active ? "animate-pulse bg-[color:var(--primary)]" : "bg-white/20"}`}
+              className={`inline-flex h-2.5 w-2.5 rounded-full ${done ? "bg-[color:var(--accent)]" : active ? "animate-pulse bg-[color:var(--accent)]" : "bg-white/20"}`}
             />
             <span>
               {step}
@@ -287,8 +285,8 @@ export function ContractDemo({ initialCaseId }: { initialCaseId?: string }) {
               isLoading ? "cursor-wait opacity-60" : "cursor-pointer"
             } ${
               isDragging
-                ? "border-[color:var(--primary)]/70 bg-[color:var(--primary)]/12"
-                : "border-[color:var(--primary)]/35 bg-[color:var(--primary)]/6 hover:border-[color:var(--primary)]/60"
+                ? "border-[color:var(--accent)]/70 bg-[color:var(--accent)]/12"
+                : "border-[color:var(--accent)]/35 bg-[color:var(--accent)]/6 hover:border-[color:var(--accent)]/60"
             }`}
             onDragOver={(event) => {
               event.preventDefault();
@@ -347,7 +345,7 @@ export function ContractDemo({ initialCaseId }: { initialCaseId?: string }) {
               onChange={(event) => setContractText(event.target.value)}
               rows={8}
               placeholder="例如：承租人應繳納三個月押金…"
-              className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-[15px] leading-7 text-[color:var(--text-primary)] outline-none transition placeholder:text-[color:var(--text-muted)] focus:border-[color:var(--primary)]/40"
+              className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-[15px] leading-7 text-[color:var(--text-primary)] outline-none transition placeholder:text-[color:var(--text-muted)] focus:border-[color:var(--accent)]/40"
             />
           </label>
           {textError && <p className="mt-2 text-[15px] text-amber-300">{textError}</p>}
@@ -380,25 +378,28 @@ export function ContractDemo({ initialCaseId }: { initialCaseId?: string }) {
       {/* 右欄：結果預覽／審查結果 */}
       <section className="panel min-w-0 p-6 sm:p-8">
         {phase === "idle" && (
-          <div className="flex h-full min-h-96 flex-col justify-between">
-            <h3 className="text-2xl font-semibold text-[color:var(--text-primary)]">結果預覽</h3>
-
-            <div className="space-y-3">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm text-[color:var(--text-secondary)]">示範合約的條款數</p>
-                <SourceTag source="mock" />
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="rounded-3xl border border-red-500/15 bg-red-500/8 p-5">
-                  <p className="text-sm text-red-200">高風險</p>
-                  <p className="mt-2 text-3xl font-semibold text-[color:var(--text-primary)]">{highRiskCount} 條</p>
-                </div>
-                <div className="rounded-3xl border border-amber-500/15 bg-amber-500/8 p-5">
-                  <p className="text-sm text-amber-200">需注意</p>
-                  <p className="mt-2 text-3xl font-semibold text-[color:var(--text-primary)]">{mediumRiskCount} 條</p>
-                </div>
-              </div>
+          <div className="flex h-full min-h-96 flex-col gap-6">
+            <div>
+              <h3 className="text-2xl font-semibold text-[color:var(--text-primary)]">結果預覽</h3>
+              <p className="mt-2 text-sm text-[color:var(--text-muted)]">上傳或貼上合約後，這裡會顯示：</p>
             </div>
+            <ol className="space-y-3">
+              {[
+                { title: "條款清單", detail: "依範本規則比對後，列出標為高風險與需注意的條款" },
+                { title: "對應依據", detail: "每一條都附上內政部住宅租賃契約書範本的出處" },
+                { title: "比對的限制", detail: "規則比對可能誤判或漏判；沒有命中，不代表合約沒有問題" },
+              ].map((item, index) => (
+                <li key={item.title} className="flex gap-4 rounded-2xl border border-dashed border-white/12 p-4">
+                  <span className="grid size-8 shrink-0 place-items-center rounded-full border border-white/15 text-sm font-semibold text-[color:var(--accent)]">
+                    {index + 1}
+                  </span>
+                  <div>
+                    <p className="font-semibold text-[color:var(--text-primary)]">{item.title}</p>
+                    <p className="mt-1 text-sm leading-7 text-[color:var(--text-secondary)]">{item.detail}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
           </div>
         )}
 

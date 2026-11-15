@@ -4,6 +4,8 @@
   --primary: #f97316;
   --primary-dark: #ea580c;
   --primary-soft: #fdba74;
+  /* 米色：選中狀態、標籤、提示等次要強調；橘色只留給主要動作 */
+  --accent: #e7d7bd;
   --bg-dark: #0f0f0f;
   --bg-card: #1a1a1a;
   --bg-card-hover: #242424;
@@ -87,7 +89,7 @@ body {
 
 .feature-card:hover {
   background: var(--bg-card-hover);
-  border-color: rgba(249, 115, 22, 0.3);
+  border-color: rgba(231, 215, 189, 0.35);
 }
 
 .eyebrow {
@@ -135,8 +137,8 @@ body {
 }
 
 .button-secondary:hover {
-  border-color: rgba(249, 115, 22, 0.26);
-  background: rgba(249, 115, 22, 0.08);
+  border-color: rgba(231, 215, 189, 0.35);
+  background: rgba(231, 215, 189, 0.08);
 }
 
 .animate-enter {
@@ -302,4 +304,77 @@ body {
   .title-accent {
     margin-left: 0;
   }
+}
+
+/* 頁面標題：手機 36px → 桌機 48px，與面板標題（24px）拉開層級 */
+.page-title {
+  font-size: clamp(2.25rem, 1.6rem + 2.4vw, 3rem);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+  color: var(--text-primary);
+}
+
+.page-lead {
+  max-width: 48rem;
+  font-size: 1rem;
+  line-height: 2;
+  color: var(--text-muted);
+}
+
+/* 鍵盤聚焦一律看得見 */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* 首頁互動房子 */
+.house-part {
+  cursor: pointer;
+  outline: none;
+  transition: transform 180ms ease, filter 180ms ease;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+
+.house-part.is-active,
+.house-part:focus-visible {
+  filter: drop-shadow(0 0 6px rgba(231, 215, 189, 0.95));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .house-part.is-active {
+    transform: translateY(-4px) scale(1.04);
+  }
+
+  .house-smoke {
+    animation: house-smoke 3.2s ease-in-out infinite;
+  }
+
+  .house-smoke-2 {
+    animation-delay: 1.1s;
+  }
+}
+
+@keyframes house-smoke {
+  0% {
+    transform: translateY(6px);
+    opacity: 0;
+  }
+  40% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(-14px);
+    opacity: 0;
+  }
+}
+
+.demo-chip-row {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+  scrollbar-width: thin;
 }

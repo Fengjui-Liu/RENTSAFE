@@ -14,8 +14,8 @@ export default async function ContractPage({ searchParams }: PageProps<"/contrac
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
       <section className="space-y-4">
-        <h1 className="text-4xl font-semibold leading-tight text-[color:var(--text-primary)]">合約審查</h1>
-        <p className="max-w-3xl text-base leading-8 text-[color:var(--text-secondary)]">
+        <h1 className="page-title">合約審查</h1>
+        <p className="page-lead">
           依內政部住宅租賃契約書範本規則比對
         </p>
       </section>
@@ -31,7 +31,7 @@ export default async function ContractPage({ searchParams }: PageProps<"/contrac
               href={resource.url}
               target="_blank"
               rel="noreferrer"
-              className="rounded-full border border-white/10 px-4 py-2 text-sm text-[color:var(--text-secondary)] transition hover:border-[color:var(--primary)]/30 hover:text-[color:var(--text-primary)]"
+              className="rounded-full border border-white/10 px-4 py-2 text-sm text-[color:var(--text-secondary)] transition hover:border-[color:var(--accent)]/30 hover:text-[color:var(--text-primary)]"
             >
               {resource.name}
             </a>

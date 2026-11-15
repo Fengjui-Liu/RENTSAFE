@@ -139,7 +139,7 @@ function HotspotDetail({
               key={option.id}
               type="button"
               onClick={() => onGuess(option.id)}
-              className="rounded-full border border-white/20 bg-white/5 px-4 py-1.5 text-sm text-[color:var(--text-primary)] transition hover:border-[color:var(--primary)]/50 hover:bg-[color:var(--primary)]/10"
+              className="rounded-full border border-white/20 bg-white/5 px-4 py-1.5 text-sm text-[color:var(--text-primary)] transition hover:border-[color:var(--accent)]/50 hover:bg-[color:var(--accent)]/10"
             >
               {option.label}
             </button>
@@ -161,7 +161,7 @@ function HotspotDetail({
 
   return (
     <div className="mt-3 space-y-3">
-      {feedback ? <p className="text-xs text-[color:var(--primary-soft)]">{feedback}</p> : null}
+      {feedback ? <p className="text-xs text-[color:var(--accent)]">{feedback}</p> : null}
       <div>
         <p className="text-xs font-semibold text-[color:var(--text-muted)]">你看到的</p>
         <p className="mt-1 text-sm leading-7 text-[color:var(--text-primary)]">{hotspot.see}</p>
@@ -172,9 +172,9 @@ function HotspotDetail({
         </p>
         <p className="mt-1 text-sm leading-7 text-[color:var(--text-primary)]">{hotspot.attention}</p>
       </div>
-      <div className="rounded-2xl border border-[color:var(--primary)]/20 bg-[color:var(--primary)]/8 px-4 py-3">
+      <div className="rounded-2xl border border-[color:var(--accent)]/20 bg-[color:var(--accent)]/8 px-4 py-3">
         <div className="flex items-center justify-between gap-2">
-          <p className="text-xs font-semibold text-[color:var(--primary-soft)]">現場怎麼問</p>
+          <p className="text-xs font-semibold text-[color:var(--accent)]">現場怎麼問</p>
           <CopyButton text={hotspot.ask} />
         </div>
         <p className="mt-1 text-sm leading-7 text-[color:var(--text-primary)]">{hotspot.ask}</p>
@@ -202,7 +202,7 @@ function PressurePanel() {
             onClick={() => setChosen(item.id)}
             className={`rounded-full border px-4 py-2 text-sm transition ${
               chosen === item.id
-                ? "border-[color:var(--primary)] bg-[color:var(--primary)]/15 text-[color:var(--text-primary)]"
+                ? "border-[color:var(--accent)] bg-[color:var(--accent)]/15 text-[color:var(--text-primary)]"
                 : "border-white/15 text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]"
             }`}
           >
@@ -212,7 +212,7 @@ function PressurePanel() {
       </div>
       {option ? (
         <div className="mt-4 space-y-2 rounded-2xl border border-white/10 bg-black/20 p-4">
-          <p className="text-xs font-semibold text-[color:var(--primary-soft)]">{option.tone}</p>
+          <p className="text-xs font-semibold text-[color:var(--accent)]">{option.tone}</p>
           <p className="text-sm leading-7 text-[color:var(--text-primary)]">房東可能的反應：{option.reaction}</p>
           {option.script ? (
             <div className="flex items-start justify-between gap-3 rounded-xl bg-white/5 px-3 py-2">
@@ -362,7 +362,7 @@ export function TourExperience() {
             {profileId === "rooftop" ? tourHouse.description : profile.note}
           </p>
         </div>
-        <p className="rounded-full border border-[color:var(--primary)]/30 bg-[color:var(--primary)]/8 px-4 py-2 text-sm text-[color:var(--text-primary)]">
+        <p className="rounded-full border border-[color:var(--accent)]/30 bg-[color:var(--accent)]/8 px-4 py-2 text-sm text-[color:var(--text-primary)]">
           已檢查 {visitedIds.length} / {hotspotCount} 項
         </p>
       </div>
@@ -377,7 +377,7 @@ export function TourExperience() {
             onClick={() => changeProfile(item.id)}
             className={`rounded-full border px-3 py-1.5 transition ${
               profileId === item.id
-                ? "border-[color:var(--primary)]/50 bg-[color:var(--primary)]/8 text-[color:var(--text-primary)]"
+                ? "border-[color:var(--accent)]/50 bg-[color:var(--accent)]/8 text-[color:var(--text-primary)]"
                 : "border-white/10 text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]"
             }`}
           >
@@ -395,7 +395,7 @@ export function TourExperience() {
             onClick={() => goToScene(index)}
             className={`rounded-full px-4 py-2 transition ${
               !showSummary && sceneIndex === index
-                ? "bg-[color:var(--primary)] font-semibold text-white"
+                ? "bg-[color:var(--accent)] font-semibold text-[#1a1a1a]"
                 : "text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]"
             }`}
           >
@@ -406,7 +406,7 @@ export function TourExperience() {
 
       {showSummary ? (
         <div className="space-y-6">
-          <div className="rounded-3xl border border-[color:var(--primary)]/30 bg-[color:var(--primary)]/5 p-5">
+          <div className="rounded-3xl border border-[color:var(--accent)]/30 bg-[color:var(--accent)]/5 p-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h3 className="text-lg font-semibold text-[color:var(--text-primary)]">我的看房提問清單</h3>
               {checklist.length > 0 ? (
@@ -426,7 +426,7 @@ export function TourExperience() {
               <ol className="mt-3 space-y-3 text-sm leading-7 text-[color:var(--text-primary)]">
                 {checklist.map((item) => (
                   <li key={item.where}>
-                    <span className="font-semibold text-[color:var(--primary-soft)]">{item.where}</span>
+                    <span className="font-semibold text-[color:var(--accent)]">{item.where}</span>
                     <br />
                     {item.ask}
                   </li>
@@ -503,7 +503,7 @@ export function TourExperience() {
                         key={hotspot.id}
                         className={`rounded-2xl border transition ${
                           active
-                            ? "border-[color:var(--primary)]/50 bg-[color:var(--primary)]/8"
+                            ? "border-[color:var(--accent)]/50 bg-[color:var(--accent)]/8"
                             : "border-white/10 bg-white/[0.03]"
                         } ${hintOn && !visited && !active ? "motion-safe:animate-pulse" : ""}`}
                       >
@@ -517,7 +517,7 @@ export function TourExperience() {
                           <span
                             className={`grid size-7 shrink-0 place-items-center rounded-full border text-xs font-semibold ${
                               visited
-                                ? "border-[color:var(--primary)]/40 text-[color:var(--primary-soft)]"
+                                ? "border-[color:var(--accent)]/40 text-[color:var(--accent)]"
                                 : "border-white/20 text-[color:var(--text-primary)]"
                             }`}
                           >
@@ -562,11 +562,11 @@ export function TourExperience() {
                       style={{ left: `${hotspot.x}%`, top: `${hotspot.y}%` }}
                       className={`absolute z-10 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition sm:text-sm ${
                         active
-                          ? "border-[color:var(--primary)] bg-[color:var(--primary)] text-white"
+                          ? "border-[color:var(--accent)] bg-[color:var(--accent)] text-[#1a1a1a]"
                           : visited
-                            ? "border-[color:var(--primary)]/40 bg-black/70 text-[color:var(--primary-soft)]"
+                            ? "border-[color:var(--accent)]/40 bg-black/70 text-[color:var(--accent)]"
                             : "border-white/20 bg-black/70 text-[color:var(--text-primary)]"
-                      } ${hintOn && !visited && !active ? "motion-safe:animate-pulse ring-2 ring-[color:var(--primary)]/60" : ""}`}
+                      } ${hintOn && !visited && !active ? "motion-safe:animate-pulse ring-2 ring-[color:var(--accent)]/60" : ""}`}
                     >
                       <span>{visited ? "✓" : index + 1}</span>
                       <span>{hotspot.label}</span>
@@ -624,7 +624,7 @@ export function TourExperience() {
           <div className="flex justify-end">
             <button
               type="button"
-              className="button-secondary min-w-52 justify-center"
+              className="button-primary min-w-52 justify-center"
               onClick={() => (isLastScene ? setShowSummary(true) : goToScene(sceneIndex + 1))}
             >
               {isLastScene ? "查看總結與提問清單" : `下一站：${scenes[sceneIndex + 1].title}`}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HomeHouse } from "@/components/home-house";
 import { SourceTag } from "@/components/source-tag";
 import { findCheckDemoCase } from "@/data/demo-cases";
 import { featureCards, mockCheckResult, type DataSource, type Status } from "@/data/mock-data";
@@ -103,9 +104,9 @@ export default function Home() {
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-20 px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
       <section className="hero-panel">
         <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-          <div className="space-y-8 animate-enter">
+          <div className="min-w-0 space-y-8 animate-enter">
             <div className="space-y-4">
-              <h1 className="text-4xl font-semibold leading-tight text-[color:var(--text-primary)]">
+              <h1 className="page-title">
                 簽約前，查核房子與合約
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-[color:var(--text-secondary)]">
@@ -134,8 +135,20 @@ export default function Home() {
             </div>
           </div>
 
+          <HomeHouse />
+        </div>
+      </section>
+
+      <section className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+        <div>
+          <p className="eyebrow">查核結果長這樣</p>
+          <h2 className="mt-2 text-2xl font-semibold text-[color:var(--text-primary)]">每一項都標示風險程度與資料來源</h2>
+          <p className="mt-3 text-sm leading-7 text-[color:var(--text-muted)]">
+            右邊是示範案例的查核摘要。真實資料與示範資料會分開標示。
+          </p>
+        </div>
           {/* 預覽：外層容器（panel）＋內容區（卡片），最多兩層 */}
-          <div className="panel animate-enter-delayed p-6 lg:p-7">
+          <div className="panel p-6 lg:p-7">
             <div className="mb-5 space-y-2">
               <p className="text-sm text-[color:var(--text-secondary)]">查核摘要・{preview.title}</p>
               <p className="text-2xl font-semibold text-[color:var(--text-primary)]">
@@ -178,7 +191,6 @@ export default function Home() {
               ))}
             </div>
           </div>
-        </div>
       </section>
 
       <section className="space-y-6">

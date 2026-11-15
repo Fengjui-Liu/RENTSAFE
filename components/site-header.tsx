@@ -18,7 +18,7 @@ export function SiteHeader() {
             </div>
           </Link>
 
-          <Link href="/check" className="button-primary shrink-0">
+          <Link href="/check" className="button-secondary shrink-0 !py-2.5">
             開始查核
           </Link>
         </div>

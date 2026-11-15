@@ -18,7 +18,7 @@ export function SiteNav() {
             href={item.href}
             aria-current={isActive ? "page" : undefined}
             className={`transition hover:text-[color:var(--text-primary)] ${
-              isActive ? "font-semibold text-[color:var(--primary)]" : ""
+              isActive ? "font-semibold text-[color:var(--accent)]" : ""
             }`}
           >
             {item.label}
