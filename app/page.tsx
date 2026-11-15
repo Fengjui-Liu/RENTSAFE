@@ -115,7 +115,7 @@ export default function Home() {
               <Link href="/check" className="button-primary justify-center">
                 上傳截圖查核
               </Link>
-              <Link href="/contract" className="button-secondary justify-center">
+              <Link href="/contract" className="button-primary justify-center">
                 上傳合約審查
               </Link>
             </div>
@@ -189,7 +189,7 @@ export default function Home() {
 
       <section className="space-y-6">
         <div>
-          <p className="eyebrow">核心功能</p>
+          <p className="eyebrow">四大面向</p>
           <h2 className="mt-2 text-2xl font-semibold text-[color:var(--text-primary)]">RENTSAFE幫你把關</h2>
         </div>
 
