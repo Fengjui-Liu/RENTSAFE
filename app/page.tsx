@@ -120,10 +120,14 @@ export default function Home() {
               </Link>
             </div>
 
-            <div className="grid max-w-xs gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="metric-card">
                 <p className="text-sm text-[color:var(--text-secondary)]">查核模組</p>
                 <p className="mt-2 text-3xl font-semibold text-[color:var(--text-primary)]">4 大面向</p>
+              </div>
+              <div className="metric-card">
+                <p className="text-sm text-[color:var(--text-secondary)]">主要功能</p>
+                <p className="mt-2 text-3xl font-semibold text-[color:var(--text-primary)]">3 大功能</p>
               </div>
             </div>
           </div>
